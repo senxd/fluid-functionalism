@@ -104,7 +104,7 @@ function AppContent() {
           Fluid Functionalism
         </h1>
         <p className="text-[14px] text-muted-foreground pl-3 mx-6 mb-4">
-          Fluid components used exclusively in service of functional clarity.
+          Shadcn components used in service of functional clarity.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-6 px-6 w-full mt-6 mb-12">
           <div>
