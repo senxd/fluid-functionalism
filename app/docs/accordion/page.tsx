@@ -21,18 +21,6 @@ const standaloneCode = `import { Accordion, AccordionItem, AccordionTrigger, Acc
       A collapsible accordion with animated expand/collapse and spring-animated chevron.
     </AccordionContent>
   </AccordionItem>
-  <AccordionItem value="item-2">
-    <AccordionTrigger>Is it accessible?</AccordionTrigger>
-    <AccordionContent>
-      Yes. Built on Radix UI Accordion with full WAI-ARIA support and keyboard navigation.
-    </AccordionContent>
-  </AccordionItem>
-  <AccordionItem value="item-3">
-    <AccordionTrigger>Can I customize it?</AccordionTrigger>
-    <AccordionContent>
-      Yes. It integrates with the shape system and supports both pill and rounded variants.
-    </AccordionContent>
-  </AccordionItem>
 </Accordion>`;
 
 const groupedCode = `import { AccordionGroup, AccordionItem, AccordionTrigger, AccordionContent } from "./components";
@@ -135,18 +123,6 @@ export default function AccordionDoc() {
               <AccordionTrigger>What is this component?</AccordionTrigger>
               <AccordionContent>
                 A collapsible accordion with animated expand/collapse and spring-animated chevron.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Is it accessible?</AccordionTrigger>
-              <AccordionContent>
-                Yes. Built on Radix UI Accordion with full WAI-ARIA support and keyboard navigation.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger>Can I customize it?</AccordionTrigger>
-              <AccordionContent>
-                Yes. It integrates with the shape system and supports both pill and rounded variants.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

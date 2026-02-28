@@ -563,6 +563,14 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
       }
     }, [groupCtx, standaloneToggle, value]);
 
+    // Register full item element for proximity hover (covers trigger + content)
+    useEffect(() => {
+      if (groupCtx?.grouped && index !== undefined) {
+        groupCtx.registerItem(index, internalRef.current);
+        return () => groupCtx.registerItem(index, null);
+      }
+    }, [index, groupCtx]);
+
     // Register full item element for expanded background measurement
     useEffect(() => {
       if (groupCtx?.grouped && index !== undefined) {
@@ -590,6 +598,7 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
           }}
           value={value}
           disabled={disabled}
+          data-proximity-index={index}
           className={cn("relative", className)}
           {...props}
         >
@@ -625,18 +634,10 @@ interface AccordionTriggerProps
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
   ({ children, className, ...props }, ref) => {
-    const wrapperRef = useRef<HTMLDivElement>(null);
     const groupCtx = useAccordionGroup();
     const { index, isOpen } = useAccordionItemContext();
     const shape = useShape();
     const [isHovered, setIsHovered] = useState(false);
-
-    useEffect(() => {
-      if (groupCtx?.grouped && index !== undefined) {
-        groupCtx.registerItem(index, wrapperRef.current);
-        return () => groupCtx.registerItem(index, null);
-      }
-    }, [index, groupCtx]);
 
     const isActive = groupCtx?.grouped
       ? groupCtx.activeIndex === index
@@ -702,13 +703,9 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
       </AccordionPrimitive.Header>
     );
 
-    // In grouped mode, wrap with a div that gets registered for proximity hover
+    // In grouped mode, return trigger directly (item registration handled by AccordionItem)
     if (groupCtx?.grouped) {
-      return (
-        <div ref={wrapperRef} data-proximity-index={index}>
-          {triggerContent}
-        </div>
-      );
+      return triggerContent;
     }
 
     // Standalone mode: local hover with animated BG
