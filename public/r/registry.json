@@ -80,8 +80,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/shape-context.json"
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json"
       ],
       "files": [
         {
@@ -115,10 +115,10 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/shape-context.json",
-        "https://fluid-functionalism.vercel.app/r/use-proximity-hover.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json",
+        "https://www.fluidfunctionalism.com/r/use-proximity-hover.json"
       ],
       "files": [
         {
@@ -142,10 +142,10 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/shape-context.json",
-        "https://fluid-functionalism.vercel.app/r/use-proximity-hover.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json",
+        "https://www.fluidfunctionalism.com/r/use-proximity-hover.json"
       ],
       "files": [
         {
@@ -165,10 +165,10 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/shape-context.json",
-        "https://fluid-functionalism.vercel.app/r/use-proximity-hover.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json",
+        "https://www.fluidfunctionalism.com/r/use-proximity-hover.json"
       ],
       "files": [
         {
@@ -189,9 +189,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/shape-context.json",
-        "https://fluid-functionalism.vercel.app/r/button.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json",
+        "https://www.fluidfunctionalism.com/r/button.json"
       ],
       "files": [
         {
@@ -210,8 +210,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/shape-context.json"
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json"
       ],
       "files": [
         {
@@ -231,9 +231,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/use-proximity-hover.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/use-proximity-hover.json"
       ],
       "files": [
         {
@@ -253,8 +253,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json"
       ],
       "files": [
         {
@@ -273,13 +273,35 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/springs.json",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json",
-        "https://fluid-functionalism.vercel.app/r/use-proximity-hover.json"
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/use-proximity-hover.json"
       ],
       "files": [
         {
           "path": "registry/default/table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "Animated slider with spring-snapped thumb, step dots, range mode, and click-to-edit value display. Built on Radix UI Slider.",
+      "dependencies": [
+        "framer-motion",
+        "@radix-ui/react-slider"
+      ],
+      "registryDependencies": [
+        "utils",
+        "https://www.fluidfunctionalism.com/r/springs.json",
+        "https://www.fluidfunctionalism.com/r/font-weight.json",
+        "https://www.fluidfunctionalism.com/r/shape-context.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/slider.tsx",
           "type": "registry:ui"
         }
       ]
@@ -294,7 +316,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "https://fluid-functionalism.vercel.app/r/font-weight.json"
+        "https://www.fluidfunctionalism.com/r/font-weight.json"
       ],
       "files": [
         {

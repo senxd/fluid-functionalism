@@ -12,7 +12,7 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const REGISTRY_DIR = new URL("../public/r", import.meta.url).pathname;
-const BASE_URL = "https://fluid-functionalism.vercel.app/r";
+const BASE_URL = "https://www.fluidfunctionalism.com/r";
 
 // Registry items that are custom (not available on the default shadcn registry).
 // "utils" is intentionally omitted — shadcn's built-in utils provides the same cn().
@@ -28,6 +28,7 @@ const CUSTOM_ITEMS = new Set([
   "input-group",
   "menu-item",
   "radio-group",
+  "slider",
   "subtle-tab",
   "switch",
   "table",

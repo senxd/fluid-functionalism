@@ -242,6 +242,20 @@
       ]
     },
     {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "Animated slider with spring-snapped thumb, step dots, range mode, and click-to-edit value display. Built on Radix UI Slider.",
+      "dependencies": ["framer-motion", "@radix-ui/react-slider"],
+      "registryDependencies": ["utils", "springs", "font-weight", "shape-context"],
+      "files": [
+        {
+          "path": "registry/default/slider.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "thinking-indicator",
       "type": "registry:ui",
       "title": "Thinking Indicator",

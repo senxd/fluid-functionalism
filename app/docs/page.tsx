@@ -28,14 +28,14 @@ export default function DocsIndex() {
           Add any component directly using the shadcn CLI:
         </p>
         <pre className="overflow-x-auto rounded-xl border border-border/60 bg-muted/30 px-4 py-3 text-[13px] text-foreground">
-          <code>npx shadcn@latest add https://fluid-functionalism.vercel.app/r/button.json</code>
+          <code>npx shadcn@latest add https://www.fluidfunctionalism.com/r/button.json</code>
         </pre>
         <p className="text-[13px] text-muted-foreground">
           Or configure a registry namespace in your <code className="text-[12px] bg-muted/50 px-1.5 py-0.5 rounded">components.json</code> for shorter commands:
         </p>
         <pre className="overflow-x-auto rounded-xl border border-border/60 bg-muted/30 px-4 py-3 text-[13px] text-foreground">
           <code>{`"registries": {
-  "@fluid": "https://fluid-functionalism.vercel.app/r/{name}.json"
+  "@fluid": "https://www.fluidfunctionalism.com/r/{name}.json"
 }`}</code>
         </pre>
         <p className="text-[13px] text-muted-foreground">

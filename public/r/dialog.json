@@ -10,9 +10,9 @@
   ],
   "registryDependencies": [
     "utils",
-    "https://fluid-functionalism.vercel.app/r/springs.json",
-    "https://fluid-functionalism.vercel.app/r/shape-context.json",
-    "https://fluid-functionalism.vercel.app/r/button.json"
+    "https://www.fluidfunctionalism.com/r/springs.json",
+    "https://www.fluidfunctionalism.com/r/shape-context.json",
+    "https://www.fluidfunctionalism.com/r/button.json"
   ],
   "files": [
     {

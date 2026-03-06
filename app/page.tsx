@@ -26,6 +26,7 @@ import {
 } from "@/registry/default/input-group";
 import { Button } from "@/registry/default/button";
 import { Switch } from "@/registry/default/switch";
+import { Slider } from "@/registry/default/slider";
 import {
   Table,
   TableHeader,
@@ -79,6 +80,7 @@ function AppContent() {
   const selectedThemeIndex = themeOptions.findIndex((o) => o.value === theme);
   const [searchValue, setSearchValue] = useState("");
   const [switchChecked, setSwitchChecked] = useState(false);
+  const [sliderValue, setSliderValue] = useState(25);
 
   const transitionSetting = useCallback((callback: () => void) => {
     const root = document.documentElement;
@@ -213,6 +215,10 @@ function AppContent() {
           checked={switchChecked}
           onToggle={() => setSwitchChecked((prev) => !prev)}
         />
+      </div>
+
+      <div className="px-6 w-full">
+        <Slider value={sliderValue} onChange={(v) => setSliderValue(v as number)} />
       </div>
 
       <div className="px-6 w-full">

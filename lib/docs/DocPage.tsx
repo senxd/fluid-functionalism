@@ -29,7 +29,7 @@ export function DocPage({ title, description, slug, children }: DocPageProps) {
             Installation
           </h2>
           <pre className="overflow-x-auto rounded-xl border border-border/60 bg-muted/30 px-4 py-3 text-[13px] text-foreground">
-            <code>npx shadcn@latest add https://fluid-functionalism.vercel.app/r/{slug}.json</code>
+            <code>npx shadcn@latest add https://www.fluidfunctionalism.com/r/{slug}.json</code>
           </pre>
         </div>
       )}

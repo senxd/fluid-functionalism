@@ -8,8 +8,8 @@
   ],
   "registryDependencies": [
     "utils",
-    "https://fluid-functionalism.vercel.app/r/font-weight.json",
-    "https://fluid-functionalism.vercel.app/r/shape-context.json"
+    "https://www.fluidfunctionalism.com/r/font-weight.json",
+    "https://www.fluidfunctionalism.com/r/shape-context.json"
   ],
   "files": [
     {
