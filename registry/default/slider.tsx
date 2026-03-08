@@ -250,7 +250,7 @@ function TooltipValue({ value, formatValue, motionX }: TooltipValueProps) {
       transition={springs.fast}
     >
       <span
-        className={cn("text-[12px] text-foreground tabular-nums whitespace-nowrap bg-accent px-2 py-1", shape.bg)}
+        className={cn("text-[12px] text-background tabular-nums whitespace-nowrap bg-foreground px-2 py-1", shape.bg)}
         style={{ fontVariationSettings: fontWeights.medium }}
       >
         {formatValue(value)}
@@ -305,6 +305,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
       cursorX: number;
     } | null>(null);
     const [hoverThumbIndex, setHoverThumbIndex] = useState<number | null>(null);
+    const [focusedThumb, setFocusedThumb] = useState<number | null>(null);
 
     // --- Motion values ---
     const motionX0 = useMotionValue(0);
@@ -682,6 +683,17 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 "0 1px 4px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)",
             }}
           />
+          {/* Focus ring */}
+          <motion.span
+            className="absolute rounded-full border border-[#6B97FF] pointer-events-none"
+            initial={false}
+            animate={{
+              opacity: focusedThumb === index ? 1 : 0,
+              width: THUMB_SIZE + 4,
+              height: THUMB_SIZE + 4,
+            }}
+            transition={springs.fast}
+          />
         </motion.span>
       );
     };
@@ -759,13 +771,17 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
               <SliderPrimitive.Range />
             </SliderPrimitive.Track>
             <SliderPrimitive.Thumb
-              className="block outline-none focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="block outline-none"
               style={{ width: THUMB_SIZE, height: THUMB_SIZE }}
+              onFocus={(e) => { if (e.currentTarget.matches(":focus-visible")) setFocusedThumb(0); }}
+              onBlur={() => setFocusedThumb((prev) => prev === 0 ? null : prev)}
             />
             {isRange && (
               <SliderPrimitive.Thumb
-                className="block outline-none focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="block outline-none"
                 style={{ width: THUMB_SIZE, height: THUMB_SIZE }}
+                onFocus={(e) => { if (e.currentTarget.matches(":focus-visible")) setFocusedThumb(1); }}
+                onBlur={() => setFocusedThumb((prev) => prev === 1 ? null : prev)}
               />
             )}
           </SliderPrimitive.Root>
@@ -802,7 +818,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
                   }}
                 >
                   <span
-                    className={cn("text-[12px] text-foreground tabular-nums whitespace-nowrap bg-accent px-2 py-1", shape.bg)}
+                    className={cn("text-[12px] text-background tabular-nums whitespace-nowrap bg-foreground px-2 py-1", shape.bg)}
                     style={{ fontVariationSettings: fontWeights.medium }}
                   >
                     {formatValue(hoverPreview.snappedValue)}

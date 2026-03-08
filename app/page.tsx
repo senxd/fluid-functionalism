@@ -28,6 +28,12 @@ import { Button } from "@/registry/default/button";
 import { Switch } from "@/registry/default/switch";
 import { Slider } from "@/registry/default/slider";
 import {
+  AccordionGroup,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/registry/default/accordion";
+import {
   Table,
   TableHeader,
   TableBody,
@@ -217,8 +223,31 @@ function AppContent() {
         />
       </div>
 
-      <div className="px-6 w-full">
+      <div className="px-6 w-full max-w-[290px]">
         <Slider value={sliderValue} onChange={(v) => setSliderValue(v as number)} />
+      </div>
+
+      <div className="px-6 w-full">
+        <AccordionGroup type="single" defaultValue="item-1">
+          <AccordionItem value="item-1" index={0}>
+            <AccordionTrigger>What is Fluid Functionalism?</AccordionTrigger>
+            <AccordionContent>
+              A design philosophy where every animation and transition serves a functional purpose — making state changes legible and interactions predictable.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2" index={1}>
+            <AccordionTrigger>How does proximity hover work?</AccordionTrigger>
+            <AccordionContent>
+              The closest item to your cursor is highlighted before you click, reducing targeting errors and cognitive load.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3" index={2}>
+            <AccordionTrigger>Can I use these with shadcn/ui?</AccordionTrigger>
+            <AccordionContent>
+              Yes. All components follow shadcn/ui conventions and work with your existing theme and setup.
+            </AccordionContent>
+          </AccordionItem>
+        </AccordionGroup>
       </div>
 
       <div className="px-6 w-full">

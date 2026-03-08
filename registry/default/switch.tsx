@@ -12,7 +12,6 @@ import { motion, useMotionValue, animate } from "framer-motion";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { cn } from "@/lib/utils";
 import { springs } from "@/lib/springs";
-import { fontWeights } from "@/lib/font-weight";
 
 interface SwitchProps extends HTMLAttributes<HTMLDivElement> {
   label: string;
@@ -213,27 +212,13 @@ const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         </SwitchPrimitive.Root>
 
         {/* Label */}
-        <span className="inline-grid text-[13px]">
-          <span
-            className="col-start-1 row-start-1 invisible"
-            style={{ fontVariationSettings: fontWeights.semibold }}
-            aria-hidden="true"
-          >
-            {label}
-          </span>
-          <span
-            className={cn(
-              "col-start-1 row-start-1 transition-[color,font-variation-settings] duration-80",
-              checked ? "text-foreground" : "text-muted-foreground"
-            )}
-            style={{
-              fontVariationSettings: checked
-                ? fontWeights.semibold
-                : fontWeights.normal,
-            }}
-          >
-            {label}
-          </span>
+        <span
+          className={cn(
+            "text-[13px] transition-[color] duration-80",
+            checked ? "text-foreground" : "text-muted-foreground"
+          )}
+        >
+          {label}
         </span>
       </div>
     );
