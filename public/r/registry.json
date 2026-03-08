@@ -68,6 +68,30 @@
       ]
     },
     {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Collapsible accordion with animated height transitions, spring-animated chevron, and proximity hover in grouped mode. Built on Radix UI Accordion.",
+      "dependencies": [
+        "framer-motion",
+        "@radix-ui/react-accordion",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "https://fluid-functionalism.vercel.app/r/springs.json",
+        "https://fluid-functionalism.vercel.app/r/font-weight.json",
+        "https://fluid-functionalism.vercel.app/r/shape-context.json",
+        "https://fluid-functionalism.vercel.app/r/use-proximity-hover.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/accordion.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",

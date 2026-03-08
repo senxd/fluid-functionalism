@@ -5,6 +5,7 @@ export interface ComponentEntry {
 }
 
 export const componentList: ComponentEntry[] = [
+  { slug: "accordion", name: "Accordion", description: "Collapsible sections with animated expand/collapse and proximity hover in grouped mode." },
   { slug: "button", name: "Button", description: "Versatile button with variants, sizes, loading state, and icon support." },
   { slug: "checkbox-group", name: "CheckboxGroup", description: "Checkbox group with merged backgrounds for contiguous selections." },
   { slug: "dialog", name: "Dialog", description: "Modal dialog with smooth enter/exit animations and overlay." },
