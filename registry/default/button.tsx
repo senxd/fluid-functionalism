@@ -5,7 +5,6 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fontWeights } from "@/lib/font-weight";
 import { useShape } from "@/lib/shape-context";
 
 const buttonVariants = cva(
@@ -121,20 +120,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 className="transition-[stroke-width] duration-80 group-hover:stroke-[2]"
               />
             )}
-            <span className="inline-grid">
-              <span
-                className="col-start-1 row-start-1 invisible"
-                style={{ fontVariationSettings: fontWeights.semibold }}
-                aria-hidden="true"
-              >
-                {children}
-              </span>
-              <span
-                className="col-start-1 row-start-1 transition-[font-variation-settings] duration-80 btn-label"
-              >
-                {children}
-              </span>
-            </span>
+            <span>{children}</span>
             {TrailingIcon && (
               <TrailingIcon
                 size={iconSize}

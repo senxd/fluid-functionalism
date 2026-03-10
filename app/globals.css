@@ -125,9 +125,10 @@ html.transitioning *::after {
               stroke 180ms ease-in-out !important;
 }
 
-body {
+html, body {
   margin: 0;
   min-height: 100vh;
+  overscroll-behavior-y: none;
   background-color: var(--background);
   font-family: var(--font-sans);
 }
@@ -143,14 +144,6 @@ h1, h2, h3, p {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-
-.btn-label {
-  font-variation-settings: 'wght' 400;
-}
-
-.group:hover .btn-label {
-  font-variation-settings: 'wght' 500;
 }
 
 @keyframes spinner-move {
