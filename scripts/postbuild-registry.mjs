@@ -28,6 +28,7 @@ const CUSTOM_ITEMS = new Set([
   "input-group",
   "menu-item",
   "radio-group",
+  "select",
   "slider",
   "subtle-tab",
   "switch",

@@ -325,17 +325,17 @@
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
-      "description": "Animated select menu with bordered/borderless variants, optional leading icons, spring-animated popover, and checkmark indicator. Built on Radix UI Select.",
+      "description": "Animated select menu with proximity hover, bordered/borderless variants, optional leading icons, spring-animated popover, and animated checkmark indicator.",
       "dependencies": [
         "framer-motion",
-        "@radix-ui/react-select",
         "class-variance-authority",
         "lucide-react"
       ],
       "registryDependencies": [
         "utils",
         "springs",
-        "shape-context"
+        "shape-context",
+        "use-proximity-hover"
       ],
       "files": [
         {
