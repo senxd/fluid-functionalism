@@ -428,6 +428,12 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
           }}
         >
           <motion.div
+            initial={{ opacity: 0, y: -4, scaleY: 0.96 }}
+            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+            transition={springs.fast}
+            style={{ transformOrigin: "top center" }}
+          >
+          <div
             ref={(node) => {
               (
                 containerRef as React.MutableRefObject<HTMLDivElement | null>
@@ -471,10 +477,6 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
               `relative flex flex-col gap-0.5 max-h-[300px] overflow-y-auto ${shape.container} bg-card shadow-[0_4px_12px_rgba(0,0,0,0.02)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-border/60 p-1 select-none outline-none`,
               className
             )}
-            initial={{ opacity: 0, y: -4, scaleY: 0.96 }}
-            animate={{ opacity: 1, y: 0, scaleY: 1 }}
-            transition={springs.fast}
-            style={{ transformOrigin: "top center" }}
           >
             {/* Selected background */}
             <AnimatePresence>
@@ -549,6 +551,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
             </AnimatePresence>
 
             {children}
+          </div>
           </motion.div>
         </div>
       </SelectContentContext.Provider>,

@@ -53,20 +53,18 @@ export function useProximityHover<T extends HTMLElement>(
   const measureItems = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-    const containerRect = container.getBoundingClientRect();
-    const scrollTop = container.scrollTop;
-    const scrollLeft = container.scrollLeft;
-    const borderTop = container.clientTop;
-    const borderLeft = container.clientLeft;
     const rects: ItemRect[] = [];
     itemsRef.current.forEach((element, index) => {
-      const rect = element.getBoundingClientRect();
-      // Content-relative positions (stable across scroll)
+      // Use offset* instead of getBoundingClientRect so measurements are
+      // unaffected by CSS transforms (e.g. scaleY animation on the parent
+      // motion.div). offsetTop/offsetLeft are layout values relative to the
+      // offsetParent (the scroll container), matching the coordinate space
+      // used by `position: absolute` children.
       rects[index] = {
-        top: rect.top - containerRect.top + scrollTop - borderTop,
-        height: rect.height,
-        left: rect.left - containerRect.left + scrollLeft - borderLeft,
-        width: rect.width,
+        top: element.offsetTop,
+        height: element.offsetHeight,
+        left: element.offsetLeft,
+        width: element.offsetWidth,
       };
     });
     itemRectsRef.current = rects;

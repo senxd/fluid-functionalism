@@ -64,14 +64,18 @@ const variantsCode = `import { Select, SelectTrigger, SelectContent, SelectItem 
 </Select>`;
 
 const iconsCode = `import { Select, SelectTrigger, SelectContent, SelectItem } from "./components";
-import { Globe, Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon, Monitor } from "lucide-react";
 
-<Select defaultValue="system">
-  <SelectTrigger icon={Globe} placeholder="Theme" />
+const [theme, setTheme] = useState("system");
+const themeIcons = { light: Sun, dark: Moon, system: Monitor };
+const ThemeIcon = themeIcons[theme] ?? Monitor;
+
+<Select value={theme} onValueChange={setTheme}>
+  <SelectTrigger icon={ThemeIcon} placeholder="Theme" />
   <SelectContent>
-    <SelectItem index={0} value="light" icon={Sun}>Light</SelectItem>
-    <SelectItem index={1} value="dark" icon={Moon}>Dark</SelectItem>
-    <SelectItem index={2} value="system" icon={Monitor}>System</SelectItem>
+    <SelectItem index={0} value="system" icon={Monitor}>System</SelectItem>
+    <SelectItem index={1} value="light" icon={Sun}>Light</SelectItem>
+    <SelectItem index={2} value="dark" icon={Moon}>Dark</SelectItem>
   </SelectContent>
 </Select>`;
 
@@ -250,8 +254,12 @@ export default function SelectDoc() {
   const [basic, setBasic] = useState("");
   const [bordered, setBordered] = useState("");
   const [borderless, setBorderless] = useState("");
+  const [theme, setTheme] = useState("system");
   const [timezone, setTimezone] = useState("");
   const [role, setRole] = useState("");
+
+  const themeIcons: Record<string, typeof Globe> = { light: Sun, dark: Moon, system: Monitor };
+  const ThemeIcon = themeIcons[theme] ?? Monitor;
 
   return (
     <DocPage
@@ -299,12 +307,12 @@ export default function SelectDoc() {
 
       <DocSection title="With Icons">
         <ComponentPreview code={iconsCode}>
-          <Select defaultValue="system">
-            <SelectTrigger icon={Globe} placeholder="Theme" />
+          <Select value={theme} onValueChange={setTheme}>
+            <SelectTrigger icon={ThemeIcon} placeholder="Theme" />
             <SelectContent>
-              <SelectItem index={0} value="light" icon={Sun}>Light</SelectItem>
-              <SelectItem index={1} value="dark" icon={Moon}>Dark</SelectItem>
-              <SelectItem index={2} value="system" icon={Monitor}>System</SelectItem>
+              <SelectItem index={0} value="system" icon={Monitor}>System</SelectItem>
+              <SelectItem index={1} value="light" icon={Sun}>Light</SelectItem>
+              <SelectItem index={2} value="dark" icon={Moon}>Dark</SelectItem>
             </SelectContent>
           </Select>
         </ComponentPreview>
