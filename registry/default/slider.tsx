@@ -970,7 +970,7 @@ Slider.displayName = "Slider";
 // ---------------------------------------------------------------------------
 
 interface SliderComfortableProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue" | "onDrag" | "onDragStart" | "onDragEnd" | "onDragOver" | "onAnimationStart"> {
   value: number;
   onChange: (value: number) => void;
   min?: number;
