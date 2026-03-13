@@ -197,37 +197,45 @@ function ValueDisplay({
     );
   };
 
-  // Measure widest possible formatted value for stable column width
-  const widestText = isRange
-    ? `${formatValue(max)} — ${formatValue(max)}`
-    : formatValue(max);
-  const charCount = (label ? `${label}: ` : "").length + widestText.length;
+
+  const widestValue = isRange
+    ? `${label ? `${label}: ` : ""}${formatValue(max)} — ${formatValue(max)}`
+    : `${label ? `${label}: ` : ""}${formatValue(max)}`;
 
   return (
     <span
       className={cn(
-        "shrink-0 text-[13px] leading-none text-muted-foreground transition-[font-variation-settings] duration-100",
+        "inline-grid shrink-0 text-[13px] leading-none text-muted-foreground transition-[font-variation-settings] duration-100",
         "tabular-nums"
       )}
       style={{
         fontVariationSettings: isInteracting
           ? fontWeights.medium
           : fontWeights.normal,
-        minWidth: `${charCount + 1}ch`,
       }}
     >
-      {label && editingIndex === null && (
-        <span className="text-muted-foreground">{label}: </span>
-      )}
-      {isRange ? (
-        <>
-          {renderValue(0)}
-          <span className="mx-1 text-muted-foreground/50">—</span>
-          {renderValue(1)}
-        </>
-      ) : (
-        renderValue(0)
-      )}
+      {/* Invisible ghost — reserves width of widest possible value */}
+      <span
+        className="col-start-1 row-start-1 invisible whitespace-nowrap"
+        style={{ fontVariationSettings: fontWeights.medium }}
+        aria-hidden="true"
+      >
+        {widestValue}
+      </span>
+      <span className="col-start-1 row-start-1 whitespace-nowrap">
+        {label && editingIndex === null && (
+          <span className="text-muted-foreground">{label}: </span>
+        )}
+        {isRange ? (
+          <>
+            {renderValue(0)}
+            <span className="mx-1 text-muted-foreground/50">—</span>
+            {renderValue(1)}
+          </>
+        ) : (
+          renderValue(0)
+        )}
+      </span>
     </span>
   );
 }
@@ -712,7 +720,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
         className={cn(
           "flex flex-col gap-0 w-full select-none touch-none overflow-visible",
           valuePosition === "left" || valuePosition === "right"
-            ? "flex-row items-center"
+            ? "flex-row items-center gap-2 mb-2"
             : "flex-col",
           disabled && "opacity-50 pointer-events-none",
           className
@@ -725,7 +733,12 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
         {/* Track area */}
         <div
           className="relative flex-1 overflow-visible"
-          style={{ height: THUMB_SIZE + (valuePosition === "tooltip" ? 16 : 0), paddingTop: valuePosition === "tooltip" ? 16 : 0 }}
+          style={{
+            height: (valuePosition === "left" || valuePosition === "right")
+              ? THUMB_SIZE + 16
+              : THUMB_SIZE + (valuePosition === "tooltip" ? 16 : 0),
+            paddingTop: valuePosition === "tooltip" ? 16 : 0,
+          }}
           onPointerEnter={() => setIsHovered(true)}
           onPointerLeave={() => {
             setIsHovered(false);
