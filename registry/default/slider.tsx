@@ -1151,7 +1151,7 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
         className={cn(
           "relative w-full h-8 select-none touch-none border border-border overflow-hidden outline-offset-2",
           variant === "scrubber"
-            ? "flex items-center gap-3 px-3 cursor-ew-resize"
+            ? "flex items-center gap-3 px-4 cursor-ew-resize"
             : "cursor-ew-resize",
           shape.bg,
           disabled && "opacity-50 pointer-events-none",
@@ -1177,13 +1177,13 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
           max={max}
           step={step}
           disabled={disabled}
-          className="absolute inset-0 opacity-0 pointer-events-none"
+          className="absolute inset-0 opacity-0 pointer-events-none [&_*]:pointer-events-none"
         >
           <SliderPrimitive.Track className="w-full h-full">
             <SliderPrimitive.Range />
           </SliderPrimitive.Track>
           <SliderPrimitive.Thumb
-            className="block outline-none pointer-events-none"
+            className="block outline-none"
             onFocus={(e) => {
               if (e.currentTarget.matches(":focus-visible")) setIsFocused(true);
             }}
@@ -1223,14 +1223,14 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
 
         {/* Pips: label + value BG layer — z-[2] (occludes dots behind text) */}
         {variant === "pips" && (
-          <div className="absolute inset-0 flex items-center px-3 z-[2] pointer-events-none" aria-hidden>
+          <div className="absolute inset-0 flex items-center px-2 z-[2] pointer-events-none" aria-hidden>
             {label && (
               <span className="text-[13px] px-2 bg-background text-transparent select-none">
                 {label}
               </span>
             )}
             <span
-              className="text-[13px] tabular-nums ml-auto pl-2 bg-background text-transparent select-none"
+              className="text-[13px] tabular-nums ml-auto px-2 bg-background text-transparent select-none"
               style={{ minWidth: `${String(formatValue(max)).length}ch` }}
             >
               {formatValue(value)}
@@ -1273,7 +1273,7 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
 
         {/* Pips: label + value text layer — z-[4] */}
         {variant === "pips" && (
-          <div className="absolute inset-0 flex items-center px-3 z-[4] pointer-events-none">
+          <div className="absolute inset-0 flex items-center px-2 z-[4] pointer-events-none">
             {label && (
               <motion.span
                 className="text-[13px] px-2"
@@ -1285,7 +1285,7 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
               </motion.span>
             )}
             <motion.span
-              className="text-[13px] tabular-nums ml-auto pl-2"
+              className="text-[13px] tabular-nums ml-auto px-2"
               initial={false}
               animate={{ color: isActive ? "var(--foreground)" : "var(--muted-foreground)" }}
               transition={springs.fast}
