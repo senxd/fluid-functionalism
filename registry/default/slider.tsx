@@ -290,7 +290,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
       step = 1,
       showSteps = false,
       showValue = true,
-      valuePosition = "bottom",
+      valuePosition = "left",
       formatValue = String,
       label,
       disabled = false,
@@ -596,7 +596,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
       if (!dragging.current) return;
       dragging.current = false;
       setIsPressed(false);
-      // No thumb scale reset needed
+      setHoverPreview(null);
 
       // Spring settle to final quantized position
       const tw = trackWidthRef.current;
@@ -674,7 +674,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
     // --- Render visual thumb (not Radix — purely visual) ---
     const renderVisualThumb = (index: number) => {
       const motionX = index === 0 ? motionX0 : motionX1;
-      const dotSize = isHovered ? THUMB_SIZE_REST + 2 : THUMB_SIZE_REST;
+      const dotSize = THUMB_SIZE_REST;
       return (
         <motion.span
           key={`visual-thumb-${index}`}
@@ -830,7 +830,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
             />
             {/* Hover value tooltip */}
             <AnimatePresence>
-              {hoverPreview && showHoverTooltip && valuePosition !== "tooltip" && (
+              {hoverPreview && showHoverTooltip && !isPressed && valuePosition !== "tooltip" && (
                 <motion.div
                   key="hover-tooltip"
                   className="absolute -translate-x-1/2 pointer-events-none z-20"
@@ -868,47 +868,50 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
             >
               {/* Filled range */}
               <motion.div
-                className="absolute h-full"
+                className="absolute h-full bg-selected/50 dark:bg-accent/40"
                 style={{
                   left: fillLeft,
                   width: fillWidth,
-                  backgroundColor: "var(--border)",
                 }}
               />
 
               {/* Hover preview — unfilled side (dark on track) */}
               <motion.div
-                className={cn("absolute h-full pointer-events-none", shape.bg)}
+                className="absolute h-full pointer-events-none"
                 initial={false}
                 animate={{
-                  left: hoverPreview && !hoverPreview.onFilledSide ? hoverPreview.left : 0,
-                  width: hoverPreview && !hoverPreview.onFilledSide ? hoverPreview.width : 0,
                   opacity: hoverPreview && !hoverPreview.onFilledSide && !isPressed ? 1 : 0,
                 }}
                 transition={{
-                  ...springs.moderate,
                   opacity: { duration: 0.15 },
                 }}
                 style={{
-                  backgroundColor: "color-mix(in srgb, var(--foreground) 20%, transparent)",
+                  left: hoverPreview && !hoverPreview.onFilledSide ? hoverPreview.left : 0,
+                  width: hoverPreview && !hoverPreview.onFilledSide ? hoverPreview.width : 0,
+                  borderRadius: hoverPreview && hoverPreview.cursorX > hoverPreview.left
+                    ? "0 9999px 9999px 0"
+                    : "9999px 0 0 9999px",
+                  backgroundColor: "color-mix(in srgb, var(--color-accent) 40%, transparent)",
                 }}
               />
 
               {/* Hover preview — filled side (light on fill) */}
               <motion.div
-                className={cn("absolute h-full pointer-events-none z-[2]", shape.bg)}
+                className="absolute h-full pointer-events-none z-[2]"
                 initial={false}
                 animate={{
-                  left: hoverPreview?.onFilledSide ? hoverPreview.left : 0,
-                  width: hoverPreview?.onFilledSide ? hoverPreview.width : 0,
                   opacity: hoverPreview?.onFilledSide && !isPressed ? 1 : 0,
                 }}
                 transition={{
-                  ...springs.moderate,
                   opacity: { duration: 0.15 },
                 }}
                 style={{
-                  backgroundColor: "color-mix(in srgb, var(--background) 25%, transparent)",
+                  left: hoverPreview?.onFilledSide ? hoverPreview.left : 0,
+                  width: hoverPreview?.onFilledSide ? hoverPreview.width : 0,
+                  borderRadius: hoverPreview && hoverPreview.cursorX > hoverPreview.left
+                    ? "0 9999px 9999px 0"
+                    : "9999px 0 0 9999px",
+                  backgroundColor: "color-mix(in srgb, var(--color-accent) 40%, transparent)",
                 }}
               />
 
