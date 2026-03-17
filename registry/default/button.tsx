@@ -10,6 +10,7 @@ import { useShape } from "@/lib/shape-context";
 const buttonVariants = cva(
   [
     "group relative inline-flex items-center justify-center outline-none cursor-pointer",
+    "text-box-trim-both text-box-edge-cap-alphabetic",
     "transition-all duration-80",
     "disabled:opacity-50 disabled:pointer-events-none",
     "focus-visible:ring-1 focus-visible:ring-[#6B97FF]",
@@ -25,9 +26,9 @@ const buttonVariants = cva(
           "text-muted-foreground bg-transparent hover:bg-muted hover:text-foreground active:bg-muted/60",
       },
       size: {
-        sm: "h-8 px-3 text-[12px] gap-1",
-        md: "h-9 px-4 text-[13px] gap-1.5",
-        lg: "h-10 px-5 text-[14px] gap-1.5",
+        sm: "h-7 px-3 text-[12px] gap-1",
+        md: "h-8 px-4 text-[13px] gap-1.5",
+        lg: "h-9 px-5 text-[14px] gap-1.5",
         "icon-sm": "h-8 w-8 p-0 [&_svg]:h-3.5 [&_svg]:w-3.5",
         icon: "h-9 w-9 p-0 [&_svg]:h-4 [&_svg]:w-4",
         "icon-lg": "h-10 w-10 p-0 [&_svg]:h-5 [&_svg]:w-5",
@@ -61,6 +62,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       trailingIcon: TrailingIcon,
       disabled,
       children,
+      style,
       ...props
     },
     ref
@@ -69,11 +71,20 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const isIconOnly = size === "icon" || size === "icon-sm" || size === "icon-lg";
     const iconSize = size === "sm" ? 14 : size === "lg" ? 20 : 16;
     const shape = useShape();
+
+    // Reduce padding by 2px on the side that has an icon
+    const basePadding = size === "sm" ? 12 : size === "lg" ? 20 : 16;
+    const paddingStyle = !isIconOnly && (LeadingIcon || TrailingIcon) ? {
+      paddingLeft: LeadingIcon ? basePadding - 2 : undefined,
+      paddingRight: TrailingIcon ? basePadding - 2 : undefined,
+    } : undefined;
+
     return (
       <Comp
         ref={ref}
         className={cn(buttonVariants({ variant, size }), shape.button, className)}
         disabled={disabled || loading}
+        style={{ ...paddingStyle, ...style }}
         {...props}
       >
         {loading ? (
