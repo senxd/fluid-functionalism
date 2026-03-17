@@ -327,7 +327,6 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const [hoverPreview, setHoverPreview] = useState<{
       left: number;
       width: number;
-      onFilledSide: boolean;
       snappedValue: number;
       cursorX: number;
     } | null>(null);
@@ -402,16 +401,11 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
           : 0;
         const nearest = nearestIdx === 0 ? c0 : c1;
 
-        // Determine if cursor is on the filled side
-        const onFilledSide = isRange
-          ? snappedX > c0 && snappedX < c1
-          : snappedX < c0;
-
         // Extend hover bar to track edges at extremes so there's no gap
         const edgeX = snappedVal === min ? 0 : snappedVal === max ? trackWidth : snappedX;
         const left = Math.min(nearest, edgeX);
         const width = Math.abs(edgeX - nearest);
-        setHoverPreview({ left, width, onFilledSide, snappedValue: snappedVal, cursorX: snappedX });
+        setHoverPreview({ left, width, snappedValue: snappedVal, cursorX: snappedX });
       },
       [min, max, step, isRange, motionX0, motionX1]
     );
@@ -832,7 +826,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
           {/* Visual track with pointer handlers */}
           <div
             ref={trackRef}
-            className="relative w-full cursor-pointer py-2"
+            className="relative w-full cursor-ew-resize py-2"
             style={{ height: THUMB_SIZE + 16, opacity: ready ? 1 : 0 }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -840,7 +834,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
           >
             {/* Extended hit area — 8px beyond each edge */}
             <div
-              className="absolute cursor-pointer"
+              className="absolute cursor-ew-resize"
               style={{ left: -8, right: -8, top: 0, bottom: 0 }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
@@ -857,7 +851,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
                   exit={{ opacity: 0, y: 4, transition: { duration: 0.1 } }}
                   transition={springs.fast}
                   style={{
-                    left: hoverPreview.cursorX + 4,
+                    left: hoverPreview.cursorX,
                     top: -20,
                   }}
                 >
@@ -1016,7 +1010,6 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
     const [hoverPreview, setHoverPreview] = useState<{
       left: number;
       width: number;
-      onFilledSide: boolean;
       snappedValue: number;
       cursorX: number;
     } | null>(null);
@@ -1122,14 +1115,11 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
           handleX = currentPercent * w;
         }
 
-        // Determine if cursor is on the filled side
-        const onFilledSide = snappedX < handleX;
-
         // Extend hover bar to container edges at extremes so there's no gap
         const edgeX = snappedVal === min ? 0 : snappedVal === max ? w : snappedX;
         const left = Math.min(handleX, edgeX);
         const width = Math.abs(edgeX - handleX);
-        setHoverPreview({ left, width, onFilledSide, snappedValue: snappedVal, cursorX: snappedX });
+        setHoverPreview({ left, width, snappedValue: snappedVal, cursorX: snappedX });
       },
       [variant, pipSteps, pipCount, min, max, step, fillPercent, zeroOffset]
     );
@@ -1249,7 +1239,7 @@ const SliderComfortable = forwardRef<HTMLDivElement, SliderComfortableProps>(
 
     return (
       <div
-        className="relative w-full"
+        className="relative w-full touch-none"
         onPointerEnter={() => { if (!disabled) setIsHovered(true); }}
         onPointerLeave={() => {
           if (!disabled) {
