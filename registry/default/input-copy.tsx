@@ -87,8 +87,8 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ type: "spring", duration: 0.16, bounce: 0.15 }}
-            className="flex items-center justify-center"
+            transition={springs.fast}
+            className="flex items-center justify-center [&_svg]:stroke-[1.5] [&_svg]:transition-[stroke-width] [&_svg]:duration-80 group-hover:[&_svg]:stroke-[2]"
           >
             <svg
               width={14}
@@ -96,7 +96,6 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
               viewBox="2 4 20 16"
               fill="none"
               stroke="currentColor"
-              strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
             >
@@ -133,11 +132,61 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
         )}
         style={{ fontVariationSettings: fontWeights.normal }}
       >
-        {iconSwitch}
-        <span className="select-none inline-grid text-left">
-          <span className="col-start-1 row-start-1 invisible" aria-hidden="true">Copied</span>
-          <span className="col-start-1 row-start-1">{copied ? "Copied" : "Copy"}</span>
-        </span>
+        <AnimatePresence mode="wait" initial={false}>
+          {copied ? (
+            <motion.span
+              key={`check-label-${copyCount}`}
+              className="flex items-center gap-1.5"
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={springs.fast}
+            >
+              <span className="flex items-center justify-center">
+                <svg
+                  width={14}
+                  height={14}
+                  viewBox="2 4 20 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <motion.path
+                    d="M6 12L10 16L18 8"
+                    initial={{ pathLength: 0 }}
+                    animate={{
+                      pathLength: 1,
+                      transition: { duration: 0.08, ease: "easeOut" },
+                    }}
+                  />
+                </svg>
+              </span>
+              <span className="select-none inline-grid text-left">
+                <span className="col-start-1 row-start-1 invisible" aria-hidden="true">Copied</span>
+                <span className="col-start-1 row-start-1">Copied</span>
+              </span>
+            </motion.span>
+          ) : (
+            <motion.span
+              key="copy-label"
+              className="flex items-center gap-1.5"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={springs.fast}
+            >
+              <span className="flex items-center justify-center">
+                <Copy size={14} strokeWidth={1.5} className="transition-[stroke-width] duration-80 group-hover:stroke-[2]" />
+              </span>
+              <span className="select-none inline-grid text-left">
+                <span className="col-start-1 row-start-1 invisible" aria-hidden="true">Copied</span>
+                <span className="col-start-1 row-start-1">Copy</span>
+              </span>
+            </motion.span>
+          )}
+        </AnimatePresence>
       </span>
     ) : (
       <span

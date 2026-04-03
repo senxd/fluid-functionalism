@@ -6,7 +6,7 @@ import { Menu } from "lucide-react";
 import { Sidebar } from "@/app/components/sidebar";
 import { MobileDrawer } from "@/registry/default/mobile-drawer";
 import { Button } from "@/registry/default/button";
-import { GitHubButton } from "@/app/components/github-button";
+import { RightPanel, SettingsContent } from "@/app/components/right-panel";
 
 interface SidebarLayoutProps {
   children: ReactNode;
@@ -39,18 +39,21 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
         <Menu />
       </Button>
 
-      {/* GitHub star button */}
-      <GitHubButton />
-
       {/* Mobile drawer */}
       <MobileDrawer open={drawerOpen} onClose={handleClose}>
         <Sidebar mobile />
+        <div className="mt-auto pt-4">
+          <SettingsContent tooltipSide="right" />
+        </div>
       </MobileDrawer>
 
       {/* Main content */}
       <main className="flex-1 min-w-0">
         {children}
       </main>
+
+      {/* Desktop right panel */}
+      <RightPanel />
     </div>
   );
 }

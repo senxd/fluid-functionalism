@@ -33,7 +33,17 @@ const buttonVariants = cva(
         icon: "h-9 w-9 p-0 [&_svg]:h-4 [&_svg]:w-4",
         "icon-lg": "h-10 w-10 p-0 [&_svg]:h-5 [&_svg]:w-5",
       },
+      iconLeft: { true: "" },
+      iconRight: { true: "" },
     },
+    compoundVariants: [
+      { size: "sm", iconLeft: true, className: "pl-[6px]" },
+      { size: "md", iconLeft: true, className: "pl-[10px]" },
+      { size: "lg", iconLeft: true, className: "pl-[14px]" },
+      { size: "sm", iconRight: true, className: "pr-[6px]" },
+      { size: "md", iconRight: true, className: "pr-[10px]" },
+      { size: "lg", iconRight: true, className: "pr-[14px]" },
+    ],
     defaultVariants: {
       variant: "primary",
       size: "md",
@@ -72,19 +82,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const iconSize = size === "sm" ? 14 : size === "lg" ? 20 : 16;
     const shape = useShape();
 
-    // Reduce padding by 2px on the side that has an icon
-    const basePadding = size === "sm" ? 12 : size === "lg" ? 20 : 16;
-    const paddingStyle = !isIconOnly && (LeadingIcon || TrailingIcon) ? {
-      paddingLeft: LeadingIcon ? basePadding - 2 : undefined,
-      paddingRight: TrailingIcon ? basePadding - 2 : undefined,
-    } : undefined;
-
     return (
       <Comp
         ref={ref}
-        className={cn(buttonVariants({ variant, size }), shape.button, className)}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            iconLeft: !isIconOnly && !!LeadingIcon,
+            iconRight: !isIconOnly && !!TrailingIcon,
+          }),
+          shape.button,
+          className
+        )}
         disabled={disabled || loading}
-        style={{ ...paddingStyle, ...style }}
+        style={style}
         {...props}
       >
         {loading ? (

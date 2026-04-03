@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "dialkit/styles.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ShapeProvider } from "@/registry/default/lib/shape-context";
 import { ThemeProvider } from "@/registry/default/lib/theme-context";
 import { SidebarLayout } from "@/app/components/sidebar-layout";
+import { DialRoot } from "dialkit";
 
 export const metadata: Metadata = {
   title: "Fluid Functionalism",
@@ -33,6 +35,7 @@ export default function RootLayout({
         <ShapeProvider defaultShape="rounded">
           <ThemeProvider>
             <SidebarLayout>{children}</SidebarLayout>
+            <DialRoot />
             <Analytics />
             <SpeedInsights />
           </ThemeProvider>
