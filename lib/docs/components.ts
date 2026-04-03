@@ -11,6 +11,7 @@ export const componentList: ComponentEntry[] = [
   { slug: "checkbox-group", name: "CheckboxGroup", description: "Checkbox group with merged backgrounds for contiguous selections." },
   { slug: "dialog", name: "Dialog", description: "Modal dialog with smooth enter/exit animations and overlay." },
   { slug: "dropdown", name: "Dropdown", description: "Menu-style dropdown with proximity hover and animated backgrounds." },
+  { slug: "input-copy", name: "InputCopy", description: "Read-only input with copy-to-clipboard button and animated feedback." },
   { slug: "input-group", name: "InputGroup", description: "Input field group with proximity hover and validation." },
   { slug: "radio-group", name: "RadioGroup", description: "Radio button group with proximity hover and animated selection." },
   { slug: "subtle-tab", name: "SubtleTab", description: "Tab navigation with smooth pill animations." },

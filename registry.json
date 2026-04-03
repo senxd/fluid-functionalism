@@ -214,6 +214,20 @@
       ]
     },
     {
+      "name": "input-copy",
+      "type": "registry:ui",
+      "title": "Input Copy",
+      "description": "Read-only input with a copy-to-clipboard button and animated check feedback. Supports optional label and shape context.",
+      "dependencies": ["framer-motion", "lucide-react"],
+      "registryDependencies": ["utils", "springs", "font-weight", "shape-context"],
+      "files": [
+        {
+          "path": "registry/default/input-copy.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
