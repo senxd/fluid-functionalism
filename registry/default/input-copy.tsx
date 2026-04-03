@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState, useCallback, useRef, type HTMLAttributes } from "react";
+import { forwardRef, useState, useCallback, useRef, useEffect, type HTMLAttributes } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -65,9 +65,19 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
       tooltipVisibleRef.current = open;
     }, []);
 
+    useEffect(() => {
+      return () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      };
+    }, []);
+
+    const handleMouseEnter = useCallback(() => {
+      setTooltipState((prev) => prev === "suppressed" ? "idle" : prev);
+    }, []);
+
     const handleMouseLeave = useCallback(() => {
-      if (tooltipState === "suppressed") setTooltipState("idle");
-    }, [tooltipState]);
+      setTooltipState((prev) => prev === "copied" ? "suppressed" : prev);
+    }, []);
 
     const iconSwitch = (
       <AnimatePresence mode="wait" initial={false}>
@@ -185,12 +195,13 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
           disabled && "opacity-50 pointer-events-none",
           className
         )}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
         {label && (
           <span
-            className={cn("text-[13px] text-muted-foreground", align === "left" ? "pl-3" : "pl-0")}
+            className={cn("text-[13px] text-muted-foreground", align === "left" ? "pl-1" : "pl-0")}
             style={{ fontVariationSettings: fontWeights.normal }}
           >
             {label}
