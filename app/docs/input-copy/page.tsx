@@ -7,20 +7,32 @@ import { DocPage, DocSection } from "@/lib/docs/DocPage";
 
 const basicCode = `import { InputCopy } from "./components";
 
-<InputCopy value="npx shadcn@latest add input-copy" />`;
+<InputCopy value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json" />`;
 
 const labelCode = `import { InputCopy } from "./components";
 
 <InputCopy
   label="Install command"
-  value="npx shadcn@latest add input-copy"
+  value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
 />`;
 
-const urlCode = `import { InputCopy } from "./components";
+const buttonVariantCode = `import { InputCopy } from "./components";
 
 <InputCopy
-  label="API endpoint"
-  value="https://api.example.com/v1/users"
+  variant="button"
+  value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
+/>`;
+
+const alignLeftCode = `import { InputCopy } from "./components";
+
+<InputCopy
+  align="left"
+  value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
+/>
+<InputCopy
+  variant="button"
+  align="left"
+  value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
 />`;
 
 const disabledCode = `import { InputCopy } from "./components";
@@ -42,6 +54,8 @@ const callbackCode = `import { InputCopy } from "./components";
 const inputCopyProps: PropDef[] = [
   { name: "value", type: "string", description: "The text value to display and copy to clipboard." },
   { name: "label", type: "string", description: "Optional label displayed above the input." },
+  { name: "variant", type: '"icon" | "button"', default: '"icon"', description: "Icon-only with tooltip, or button with visible label." },
+  { name: "align", type: '"right" | "left"', default: '"right"', description: "Position of the copy action relative to the value." },
   { name: "onCopy", type: "() => void", description: "Callback fired after the value is successfully copied." },
   { name: "disabled", type: "boolean", default: "false", description: "Disables the input and copy button." },
 ];
@@ -56,7 +70,7 @@ export default function InputCopyDoc() {
       <DocSection title="Basic">
         <ComponentPreview code={basicCode}>
           <div className="w-72">
-            <InputCopy value="npx shadcn@latest add input-copy" />
+            <InputCopy value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json" />
           </div>
         </ComponentPreview>
       </DocSection>
@@ -66,18 +80,34 @@ export default function InputCopyDoc() {
           <div className="w-72">
             <InputCopy
               label="Install command"
-              value="npx shadcn@latest add input-copy"
+              value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
             />
           </div>
         </ComponentPreview>
       </DocSection>
 
-      <DocSection title="Long Value">
-        <ComponentPreview code={urlCode}>
+      <DocSection title="Button Variant">
+        <ComponentPreview code={buttonVariantCode}>
           <div className="w-72">
             <InputCopy
-              label="API endpoint"
-              value="https://api.example.com/v1/users"
+              variant="button"
+              value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
+            />
+          </div>
+        </ComponentPreview>
+      </DocSection>
+
+      <DocSection title="Left Aligned">
+        <ComponentPreview code={alignLeftCode}>
+          <div className="flex flex-col gap-4 w-72">
+            <InputCopy
+              align="left"
+              value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
+            />
+            <InputCopy
+              variant="button"
+              align="left"
+              value="npx shadcn@latest add https://www.fluidfunctionalism.com/r/input-copy.json"
             />
           </div>
         </ComponentPreview>
