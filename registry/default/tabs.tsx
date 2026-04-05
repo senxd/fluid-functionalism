@@ -54,7 +54,7 @@ function useTabsList() {
 interface TabsProps
   extends Omit<
     ComponentPropsWithoutRef<typeof TabsPrimitive.Root>,
-    "onValueChange"
+    "onValueChange" | "onSelect"
   > {
   /** Controlled value (takes precedence over selectedIndex). */
   value?: string;
