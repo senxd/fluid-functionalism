@@ -1,19 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  SquareLibrary,
-  Clock,
-  Star,
-  Users,
-  Lock,
-  Mail,
-  Bell,
-  Shield,
-  Settings,
-  Palette,
-  Monitor,
-} from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import {
   Dropdown,
   DropdownLabel,
@@ -87,7 +75,7 @@ const separatorProps: PropDef[] = [
 ];
 
 const menuItemProps: PropDef[] = [
-  { name: "icon", type: "LucideIcon", description: "Icon displayed in the menu item." },
+  { name: "icon", type: "IconComponent", description: "Icon displayed in the menu item." },
   { name: "label", type: "string", description: "Text label for the menu item." },
   { name: "index", type: "number", description: "Position index within the dropdown." },
   { name: "checked", type: "boolean", default: "false", description: "Whether this item is checked." },
@@ -95,6 +83,18 @@ const menuItemProps: PropDef[] = [
 ];
 
 export default function DropdownDoc() {
+  const SquareLibrary = useIcon("square-library");
+  const Clock = useIcon("clock");
+  const Star = useIcon("star");
+  const Users = useIcon("users");
+  const Lock = useIcon("lock");
+  const Mail = useIcon("mail");
+  const Bell = useIcon("bell");
+  const Shield = useIcon("shield");
+  const Settings = useIcon("settings");
+  const Palette = useIcon("palette");
+  const Monitor = useIcon("monitor");
+
   const items = [
     { icon: SquareLibrary, label: "Teamspaces" },
     { icon: Clock, label: "Recents" },

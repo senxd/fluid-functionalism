@@ -11,8 +11,8 @@ import {
 } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIcon } from "@/lib/icon-context";
 import { springs } from "@/lib/springs";
 import { useShape } from "@/lib/shape-context";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,7 @@ interface DialogContentProps
 
 const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className, children, size = "sm", ...props }, ref) => {
+    const XIcon = useIcon("x");
     const open = useContext(DialogOpenContext);
     const shape = useShape();
     const [mounted, setMounted] = useState(false);
@@ -101,7 +102,7 @@ const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(
                 size="icon-sm"
                 className="absolute right-3 top-3"
               >
-                <X />
+                <XIcon />
                 <span className="sr-only">Close</span>
               </Button>
             </DialogPrimitive.Close>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, ArrowRight, Search, Loader } from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import { Button } from "@/registry/default/button";
 import { ComponentPreview } from "@/lib/docs/ComponentPreview";
 import { PropsTable, type PropDef } from "@/lib/docs/PropsTable";
@@ -44,13 +44,18 @@ const buttonProps: PropDef[] = [
   { name: "variant", type: '"primary" | "secondary" | "tertiary" | "ghost"', default: '"primary"', description: "Visual style of the button." },
   { name: "size", type: '"sm" | "md" | "lg" | "icon-sm" | "icon" | "icon-lg"', default: '"md"', description: "Size of the button." },
   { name: "loading", type: "boolean", default: "false", description: "Shows a spinner and disables the button." },
-  { name: "leadingIcon", type: "LucideIcon", description: "Icon displayed before the label." },
-  { name: "trailingIcon", type: "LucideIcon", description: "Icon displayed after the label." },
+  { name: "leadingIcon", type: "IconComponent", description: "Icon displayed before the label." },
+  { name: "trailingIcon", type: "IconComponent", description: "Icon displayed after the label." },
   { name: "asChild", type: "boolean", default: "false", description: "Merge props onto the child element instead of rendering a <button>." },
   { name: "disabled", type: "boolean", default: "false", description: "Disables the button." },
 ];
 
 export default function ButtonDoc() {
+  const Plus = useIcon("plus");
+  const ArrowRight = useIcon("arrow-right");
+  const Search = useIcon("search");
+  const Loader = useIcon("loader");
+
   const [loading, setLoading] = useState(false);
 
   return (

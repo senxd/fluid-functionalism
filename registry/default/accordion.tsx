@@ -13,8 +13,8 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIcon } from "@/lib/icon-context";
 import { springs } from "@/lib/springs";
 import { fontWeights } from "@/lib/font-weight";
 import { useProximityHover } from "@/hooks/use-proximity-hover";
@@ -158,6 +158,9 @@ const AccordionGroup = forwardRef<HTMLDivElement, AccordionGroupProps>(
       }
       return [];
     });
+    const singleOnValueChange = (props as AccordionGroupSingleProps).onValueChange;
+    const multipleOnValueChange = (props as AccordionGroupMultipleProps).onValueChange;
+    const controlledMultipleValue = (props as AccordionGroupMultipleProps).value;
 
     const openValues = new Set<string>(
       type === "multiple"
@@ -175,8 +178,7 @@ const AccordionGroup = forwardRef<HTMLDivElement, AccordionGroupProps>(
         if (sp.onValueChange) sp.onValueChange(value);
         else setInternalSingleValue(value);
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [(props as AccordionGroupSingleProps).onValueChange]
+      [singleOnValueChange]
     );
 
     const handleMultipleValueChange = useCallback(
@@ -185,8 +187,7 @@ const AccordionGroup = forwardRef<HTMLDivElement, AccordionGroupProps>(
         if (mp.onValueChange) mp.onValueChange(value);
         else setInternalMultipleValue(value);
       },
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [(props as AccordionGroupMultipleProps).onValueChange]
+      [multipleOnValueChange]
     );
 
     const toggleValue = useCallback(
@@ -205,8 +206,7 @@ const AccordionGroup = forwardRef<HTMLDivElement, AccordionGroupProps>(
         handleSingleValueChange,
         handleMultipleValueChange,
         internalMultipleValue,
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        (props as AccordionGroupMultipleProps).value,
+        controlledMultipleValue,
       ]
     );
 
@@ -217,16 +217,12 @@ const AccordionGroup = forwardRef<HTMLDivElement, AccordionGroupProps>(
 
     // Remeasure synchronously when open values change so the first
     // paint already reflects shifted trigger positions.
+    const openValuesKey = [...openValues].join(",");
+
     useEffect(() => {
       measureItems();
       measureFullItems();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [...openValues].join(","),
-      measureItems,
-      measureFullItems,
-    ]);
+    }, [measureItems, measureFullItems, openValuesKey]);
 
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
@@ -634,6 +630,7 @@ interface AccordionTriggerProps
 
 const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
   ({ children, className, ...props }, ref) => {
+    const ChevronRight = useIcon("chevron-right");
     const groupCtx = useAccordionGroup();
     const { index, isOpen } = useAccordionItemContext();
     const shape = useShape();
@@ -743,7 +740,7 @@ interface AccordionContentProps extends HTMLAttributes<HTMLDivElement> {
 const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
   ({ children, className, ...props }, ref) => {
     const groupCtx = useAccordionGroup();
-    const { isOpen, onToggle } = useAccordionItemContext();
+    const { isOpen } = useAccordionItemContext();
 
     return (
       <AnimatePresence initial={false}>
@@ -751,8 +748,7 @@ const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps>(
           <AccordionPrimitive.Content forceMount asChild {...props}>
             <motion.div
               ref={ref}
-              className={cn("overflow-hidden cursor-pointer", className)}
-              onClick={onToggle}
+              className={cn("overflow-hidden", className)}
               initial={{ height: 0 }}
               animate={{ height: "auto" }}
               exit={{ height: 0 }}

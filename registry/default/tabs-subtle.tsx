@@ -13,10 +13,11 @@ import {
   type HTMLAttributes,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "@/lib/icon-context";
 import { cn } from "@/lib/utils";
 import { springs } from "@/lib/springs";
 import { fontWeights } from "@/lib/font-weight";
+import { useShape } from "@/lib/shape-context";
 import { useProximityHover } from "@/hooks/use-proximity-hover";
 
 interface TabsSubtleContextValue {
@@ -47,6 +48,7 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const isMouseInside = useRef(false);
     const generatedId = useId();
+    const shape = useShape();
     const idPrefix = idPrefixProp || generatedId;
 
     const {
@@ -146,7 +148,7 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
           {/* Selected pill */}
           {selectedRect && (
             <motion.div
-              className="absolute rounded-full bg-selected/50 dark:bg-accent/40 pointer-events-none"
+              className={cn("absolute bg-selected/50 dark:bg-accent/40 pointer-events-none", shape.bg)}
               initial={false}
               animate={{
                 left: selectedRect.left,
@@ -166,7 +168,7 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
           <AnimatePresence>
             {hoverRect && !isHoveringSelected && selectedRect && (
               <motion.div
-                className="absolute rounded-full bg-accent/60 dark:bg-accent/30 pointer-events-none"
+                className={cn("absolute bg-accent/60 dark:bg-accent/30 pointer-events-none", shape.bg)}
                 initial={{
                   left: selectedRect.left,
                   width: selectedRect.width,
@@ -205,7 +207,7 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
           <AnimatePresence>
             {focusRect && (
               <motion.div
-                className="absolute rounded-full pointer-events-none z-20 border border-[#6B97FF]"
+                className={cn("absolute pointer-events-none z-20 border border-[#6B97FF]", shape.focusRing)}
                 initial={false}
                 animate={{
                   left: focusRect.left - 2,
@@ -232,7 +234,7 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
 TabsSubtle.displayName = "TabsSubtle";
 
 interface TabsSubtleItemProps extends HTMLAttributes<HTMLButtonElement> {
-  icon: LucideIcon;
+  icon?: IconComponent;
   label: string;
   index: number;
 }
@@ -240,6 +242,7 @@ interface TabsSubtleItemProps extends HTMLAttributes<HTMLButtonElement> {
 const TabsSubtleItem = forwardRef<HTMLButtonElement, TabsSubtleItemProps>(
   ({ icon: Icon, label, index, className, ...props }, ref) => {
     const internalRef = useRef<HTMLButtonElement>(null);
+    const shape = useShape();
     const { registerTab, hoveredIndex, selectedIndex, onSelect, idPrefix } =
       useTabsSubtle();
 
@@ -265,19 +268,22 @@ const TabsSubtleItem = forwardRef<HTMLButtonElement, TabsSubtleItemProps>(
         tabIndex={selectedIndex === index ? 0 : -1}
         onClick={() => onSelect(index)}
         className={cn(
-          "relative z-10 flex items-center gap-2 rounded-full px-3 py-2 cursor-pointer bg-transparent border-none outline-none",
+          "relative z-10 flex items-center gap-2 px-3 py-2 cursor-pointer bg-transparent border-none outline-none",
+          shape.bg,
           className
         )}
         {...props}
       >
-        <Icon
-          size={16}
-          strokeWidth={isActive ? 2 : 1.5}
-          className={cn(
-            "transition-[color,stroke-width] duration-80",
-            isActive ? "text-foreground" : "text-muted-foreground"
-          )}
-        />
+        {Icon && (
+          <Icon
+            size={16}
+            strokeWidth={isActive ? 2 : 1.5}
+            className={cn(
+              "transition-[color,stroke-width] duration-80",
+              isActive ? "text-foreground" : "text-muted-foreground"
+            )}
+          />
+        )}
         <span className="inline-grid text-[13px] whitespace-nowrap">
           <span
             className="col-start-1 row-start-1 invisible"

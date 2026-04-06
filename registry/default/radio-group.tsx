@@ -1,12 +1,14 @@
 "use client";
 
 import {
+  Children,
   useRef,
   useState,
   useEffect,
   createContext,
   useContext,
   forwardRef,
+  isValidElement,
   type ReactNode,
   type HTMLAttributes,
 } from "react";
@@ -21,6 +23,9 @@ import { useShape } from "@/lib/shape-context";
 interface RadioGroupContextValue {
   registerItem: (index: number, element: HTMLElement | null) => void;
   activeIndex: number | null;
+  selectedIndex: number | null;
+  selectedValue?: string;
+  onValueChange?: (value: string) => void;
 }
 
 const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);
@@ -33,7 +38,7 @@ function useRadioGroupContext() {
 
 interface RadioGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, "onSelect"> {
   children: ReactNode;
-  selectedIndex: number;
+  selectedIndex?: number;
   value?: string;
   onValueChange?: (value: string) => void;
 }
@@ -41,6 +46,9 @@ interface RadioGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, "onSelect
 const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
   ({ children, selectedIndex, value, onValueChange, className, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const childValues = Children.toArray(children)
+      .filter(isValidElement)
+      .map((child) => (child.props as { value?: string }).value);
     const {
       activeIndex,
       setActiveIndex,
@@ -56,12 +64,17 @@ const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     }, [measureItems, children]);
 
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+    const resolvedSelectedIndex =
+      value !== undefined
+        ? childValues.findIndex((childValue) => childValue === value)
+        : selectedIndex ?? -1;
 
     const activeRect = activeIndex !== null ? itemRects[activeIndex] : null;
     const focusRect = focusedIndex !== null ? itemRects[focusedIndex] : null;
-    const selectedRect = itemRects[selectedIndex];
+    const selectedRect =
+      resolvedSelectedIndex >= 0 ? itemRects[resolvedSelectedIndex] : null;
     const isHoveringOther =
-      activeIndex !== null && activeIndex !== selectedIndex;
+      activeIndex !== null && activeIndex !== resolvedSelectedIndex;
     const shape = useShape();
 
     const content = (
@@ -198,7 +211,15 @@ const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     // If Radix value/onValueChange provided, wrap with Radix RadioGroup
     if (value !== undefined && onValueChange) {
       return (
-        <RadioGroupContext.Provider value={{ registerItem, activeIndex }}>
+        <RadioGroupContext.Provider
+          value={{
+            registerItem,
+            activeIndex,
+            selectedIndex: resolvedSelectedIndex >= 0 ? resolvedSelectedIndex : null,
+            selectedValue: value,
+            onValueChange,
+          }}
+        >
           <RadioGroupPrimitive.Root
             value={value}
             onValueChange={onValueChange}
@@ -211,7 +232,13 @@ const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     }
 
     return (
-      <RadioGroupContext.Provider value={{ registerItem, activeIndex }}>
+      <RadioGroupContext.Provider
+        value={{
+          registerItem,
+          activeIndex,
+          selectedIndex: selectedIndex ?? null,
+        }}
+      >
         {content}
       </RadioGroupContext.Provider>
     );
@@ -223,8 +250,8 @@ RadioGroup.displayName = "RadioGroup";
 interface RadioItemProps extends HTMLAttributes<HTMLDivElement> {
   label: string;
   index: number;
-  selected: boolean;
-  onSelect: () => void;
+  selected?: boolean;
+  onSelect?: () => void;
   value?: string;
 }
 
@@ -232,7 +259,13 @@ const RadioItem = forwardRef<HTMLDivElement, RadioItemProps>(
   ({ label, index, selected, onSelect, value, className, ...props }, ref) => {
     const internalRef = useRef<HTMLDivElement>(null);
     const hasMounted = useRef(false);
-    const { registerItem, activeIndex } = useRadioGroupContext();
+    const {
+      registerItem,
+      activeIndex,
+      selectedIndex,
+      selectedValue,
+      onValueChange,
+    } = useRadioGroupContext();
 
     useEffect(() => {
       registerItem(index, internalRef.current);
@@ -246,6 +279,17 @@ const RadioItem = forwardRef<HTMLDivElement, RadioItemProps>(
     const isActive = activeIndex === index;
     const skipAnimation = !hasMounted.current;
     const shape = useShape();
+    const isSelected =
+      value !== undefined && selectedValue !== undefined
+        ? selectedValue === value
+        : selected ?? selectedIndex === index;
+
+    const handleSelect = () => {
+      if (value !== undefined) {
+        onValueChange?.(value);
+      }
+      onSelect?.();
+    };
 
     return (
       <div
@@ -255,15 +299,15 @@ const RadioItem = forwardRef<HTMLDivElement, RadioItemProps>(
           else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
         }}
         data-proximity-index={index}
-        tabIndex={selected ? 0 : -1}
+        tabIndex={isSelected ? 0 : -1}
         role="radio"
-        aria-checked={selected}
+        aria-checked={isSelected}
         aria-label={label}
-        onClick={onSelect}
+        onClick={handleSelect}
         onKeyDown={(e) => {
           if (e.key === " " || e.key === "Enter") {
             e.preventDefault();
-            onSelect();
+            handleSelect();
           }
         }}
         className={cn(
@@ -278,7 +322,7 @@ const RadioItem = forwardRef<HTMLDivElement, RadioItemProps>(
           <div
             className={cn(
               "absolute inset-0 rounded-full border-solid transition-all duration-80",
-              selected
+              isSelected
                 ? "border-[1.5px] border-transparent"
                 : isActive
                 ? "border-[1.5px] border-neutral-400 dark:border-neutral-500"
@@ -287,7 +331,7 @@ const RadioItem = forwardRef<HTMLDivElement, RadioItemProps>(
           />
           {/* Dot */}
           <AnimatePresence>
-            {selected && (
+            {isSelected && (
               <motion.div
                 className="absolute inset-0 flex items-center justify-center"
                 initial={{
@@ -316,12 +360,12 @@ const RadioItem = forwardRef<HTMLDivElement, RadioItemProps>(
           <span
             className={cn(
               "col-start-1 row-start-1 transition-[color,font-variation-settings] duration-80",
-              selected || isActive
+              isSelected || isActive
                 ? "text-foreground"
                 : "text-muted-foreground"
             )}
             style={{
-              fontVariationSettings: selected
+              fontVariationSettings: isSelected
                 ? fontWeights.semibold
                 : fontWeights.normal,
             }}

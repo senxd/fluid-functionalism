@@ -2,8 +2,8 @@
 
 import { forwardRef, useState, useCallback, useRef, useEffect, type HTMLAttributes } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIcon } from "@/lib/icon-context";
 import { fontWeights } from "@/lib/font-weight";
 import { useShape } from "@/lib/shape-context";
 import { springs } from "@/lib/springs";
@@ -29,6 +29,7 @@ interface InputCopyProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"
 
 const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
   ({ value, label, onCopy, disabled, variant = "icon", align = "right", className, ...props }, ref) => {
+    const CopyIcon = useIcon("copy");
     const [copied, setCopied] = useState(false);
     const [copyCount, setCopyCount] = useState(0);
     // "idle" = normal tooltip behavior, "copied" = force open, "suppressed" = force closed
@@ -118,7 +119,7 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
             transition={springs.fast}
             className="flex items-center justify-center"
           >
-            <Copy size={14} strokeWidth={1.5} className="transition-[stroke-width] duration-80 group-hover:stroke-[2]" />
+            <CopyIcon size={14} strokeWidth={1.5} className="transition-[stroke-width] duration-80 group-hover:stroke-[2]" />
           </motion.span>
         )}
       </AnimatePresence>
@@ -178,7 +179,7 @@ const InputCopy = forwardRef<HTMLDivElement, InputCopyProps>(
               transition={springs.fast}
             >
               <span className="flex items-center justify-center">
-                <Copy size={14} strokeWidth={1.5} className="transition-[stroke-width] duration-80 group-hover:stroke-[2]" />
+                <CopyIcon size={14} strokeWidth={1.5} className="transition-[stroke-width] duration-80 group-hover:stroke-[2]" />
               </span>
               <span className="select-none inline-grid text-left">
                 <span className="col-start-1 row-start-1 invisible" aria-hidden="true">Copied</span>

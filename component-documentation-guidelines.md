@@ -19,6 +19,8 @@ Checklist and conventions for documenting every new component in this project. F
   import { springs } from "@/lib/springs";
   import { fontWeights } from "@/lib/font-weight";
   import { useShape } from "@/lib/shape-context";
+  import { useIcon } from "@/lib/icon-context";
+  import type { IconComponent } from "@/lib/icon-context";
   import { useProximityHover } from "@/hooks/use-proximity-hover";
   ```
 
@@ -120,7 +122,11 @@ export default function ComponentNameDoc() {
 - Always use `@/` path aliases, never relative paths like `../../`
 - Component: `@/registry/default/<component-name>`
 - Doc utilities: `@/lib/docs/ComponentPreview`, `@/lib/docs/PropsTable`, `@/lib/docs/DocPage`
-- Icons: `lucide-react`
+- Icons: `@/lib/icon-context` (`useIcon`, `useIcons` hooks, `IconComponent` type)
+  - Components with internal icons: `import { useIcon } from "@/lib/icon-context";`
+  - Components accepting icon props: `import type { IconComponent } from "@/lib/icon-context";`
+  - Doc pages: call `useIcon("icon-name")` inside the component function for each icon needed
+  - Icon prop type is `IconComponent`, not `LucideIcon`
 
 ### Code Snippets
 
@@ -189,6 +195,8 @@ registry/default/
   lib/springs.ts              ← animation tokens
   lib/font-weight.ts          ← font weight tokens
   lib/shape-context.tsx        ← shape provider
+  lib/icon-context.tsx         ← icon library provider
+  lib/icon-map.tsx             ← icon mapping across libraries
   hooks/use-proximity-hover.ts ← proximity hook
 
 lib/docs/

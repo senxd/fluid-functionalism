@@ -14,7 +14,7 @@ import {
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cva, type VariantProps } from "class-variance-authority";
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "@/lib/icon-context";
 import { cn } from "@/lib/utils";
 import { springs } from "@/lib/springs";
 import { useProximityHover } from "@/hooks/use-proximity-hover";
@@ -80,9 +80,6 @@ function Select({
   const currentValue = value !== undefined ? value : internalValue;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const labelMap = useRef(new Map<string, string>());
-  // Force re-render after mount so trigger picks up labels registered by items
-  const [, setReady] = useState(false);
-  useEffect(() => setReady(true), []);
 
   const onChange = useCallback(
     (v: string) => {
@@ -151,7 +148,7 @@ const triggerVariants = cva(
 interface SelectTriggerProps
   extends Omit<HTMLAttributes<HTMLButtonElement>, "children">,
     VariantProps<typeof triggerVariants> {
-  icon?: LucideIcon;
+  icon?: IconComponent;
   placeholder?: string;
   error?: string;
 }
@@ -377,7 +374,10 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
           e.preventDefault();
           if (currentIdx === -1) {
             // No item focused yet — focus checked or first item
-            const checked = checkedIndex != null ? items[checkedIndex] : null;
+            const checked =
+              value !== ""
+                ? items.find((item) => item.getAttribute("data-value") === value)
+                : null;
             (checked ?? items[0])?.focus();
           } else {
             const next = ["ArrowDown", "ArrowRight"].includes(e.key)
@@ -393,7 +393,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
           items[items.length - 1]?.focus();
         }
       },
-      [checkedIndex]
+      [value]
     );
 
     // Render hidden when closed so items can register labels
@@ -567,7 +567,7 @@ SelectContent.displayName = "SelectContent";
 // ---------------------------------------------------------------------------
 
 interface SelectItemProps extends HTMLAttributes<HTMLDivElement> {
-  icon?: LucideIcon;
+  icon?: IconComponent;
   index: number;
   value: string;
   disabled?: boolean;

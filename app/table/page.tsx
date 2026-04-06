@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import {
-  Lightbulb,
-  Rocket,
-  Heart,
-  Paintbrush,
-  Brain,
-} from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -24,7 +18,6 @@ import {
   TableCell,
 } from "@/registry/default/table";
 import { fontWeights } from "@/registry/default/lib/font-weight";
-import { springs } from "@/registry/default/lib/springs";
 
 // ── Data ──────────────────────────────────────────────────
 
@@ -34,14 +27,6 @@ interface Quote {
   text: string;
   tag: string;
 }
-
-const tabs = [
-  { icon: Lightbulb, label: "Wisdom" },
-  { icon: Rocket, label: "Ambition" },
-  { icon: Heart, label: "Love & Life" },
-  { icon: Paintbrush, label: "Creativity" },
-  { icon: Brain, label: "Philosophy" },
-] as const;
 
 const quotes: Record<string, Quote[]> = {
   Wisdom: [
@@ -368,6 +353,20 @@ function RowCheckbox({
 // ── Page ──────────────────────────────────────────────────
 
 export default function TablePage() {
+  const Lightbulb = useIcon("lightbulb");
+  const Rocket = useIcon("rocket");
+  const Heart = useIcon("heart");
+  const Paintbrush = useIcon("paintbrush");
+  const Brain = useIcon("brain");
+
+  const tabs = [
+    { icon: Lightbulb, label: "Wisdom" },
+    { icon: Rocket, label: "Ambition" },
+    { icon: Heart, label: "Love & Life" },
+    { icon: Paintbrush, label: "Creativity" },
+    { icon: Brain, label: "Philosophy" },
+  ];
+
   const [selectedTab, setSelectedTab] = useState(0);
   const [saved, setSaved] = useState<Set<string>>(new Set());
 

@@ -114,7 +114,7 @@ const Switch = forwardRef<HTMLDivElement, SwitchProps>(
     );
 
     const handlePointerUp = useCallback(
-      (e: React.PointerEvent<HTMLDivElement>) => {
+      () => {
         if (!pointerStart.current) return;
         setPressed(false);
 

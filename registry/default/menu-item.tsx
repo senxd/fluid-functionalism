@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, forwardRef, type HTMLAttributes } from "react";
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "@/lib/icon-context";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDropdown } from "@/components/ui/dropdown";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import { fontWeights } from "@/lib/font-weight";
 import { useShape } from "@/lib/shape-context";
 
 interface MenuItemProps extends HTMLAttributes<HTMLDivElement> {
-  icon: LucideIcon;
+  icon: IconComponent;
   label: string;
   index: number;
   checked?: boolean;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Mail } from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import { InputGroup, InputField } from "@/registry/default/input-group";
 import { ComponentPreview } from "@/lib/docs/ComponentPreview";
 import { PropsTable, type PropDef } from "@/lib/docs/PropsTable";
@@ -67,12 +67,15 @@ const fieldProps: PropDef[] = [
   { name: "value", type: "string", description: "Controlled input value." },
   { name: "onChange", type: "(value: string) => void", description: "Called when the input value changes." },
   { name: "placeholder", type: "string", description: "Placeholder text." },
-  { name: "icon", type: "LucideIcon", description: "Leading icon inside the input." },
+  { name: "icon", type: "IconComponent", description: "Leading icon inside the input." },
   { name: "error", type: "string", description: "Error message shown below the input." },
   { name: "disabled", type: "boolean", default: "false", description: "Disables the input." },
 ];
 
 export default function InputGroupDoc() {
+  const Search = useIcon("search");
+  const Mail = useIcon("mail");
+
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

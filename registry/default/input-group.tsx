@@ -12,7 +12,7 @@ import {
   type HTMLAttributes,
   type InputHTMLAttributes,
 } from "react";
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "@/lib/icon-context";
 import { cn } from "@/lib/utils";
 import { fontWeights } from "@/lib/font-weight";
 import { useShape } from "@/lib/shape-context";
@@ -20,8 +20,6 @@ import { useShape } from "@/lib/shape-context";
 interface InputGroupContextValue {
   registerItem: (index: number, element: HTMLLabelElement | null) => void;
   activeIndex: number | null;
-  focusedIndex: number | null;
-  setFocusedIndex: (index: number | null) => void;
 }
 
 const InputGroupContext = createContext<InputGroupContextValue | null>(null);
@@ -39,10 +37,8 @@ interface InputGroupProps extends HTMLAttributes<HTMLDivElement> {
 
 const InputGroup = forwardRef<HTMLDivElement, InputGroupProps>(
   ({ children, className, ...props }, ref) => {
-    const containerRef = useRef<HTMLDivElement>(null);
     const itemsRef = useRef(new Map<number, HTMLLabelElement>());
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
     const registerItem = useCallback(
       (index: number, element: HTMLLabelElement | null) => {
@@ -81,14 +77,10 @@ const InputGroup = forwardRef<HTMLDivElement, InputGroupProps>(
 
     return (
       <InputGroupContext.Provider
-        value={{ registerItem, activeIndex, focusedIndex, setFocusedIndex }}
+        value={{ registerItem, activeIndex }}
       >
         <div
-          ref={(node) => {
-            (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-            if (typeof ref === "function") ref(node);
-            else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-          }}
+          ref={ref}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           className={cn("flex flex-col gap-3 w-72 max-w-full", className)}
@@ -107,7 +99,7 @@ interface InputFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "index"> {
   label: string;
   placeholder?: string;
-  icon?: LucideIcon;
+  icon?: IconComponent;
   index: number;
   value: string;
   onChange: (value: string) => void;
@@ -133,8 +125,7 @@ const InputField = forwardRef<HTMLLabelElement, InputFieldProps>(
     ref
   ) => {
     const internalRef = useRef<HTMLLabelElement>(null);
-    const { registerItem, activeIndex, setFocusedIndex } =
-      useInputGroup();
+    const { registerItem, activeIndex } = useInputGroup();
     const [isFocused, setIsFocused] = useState(false);
     const shape = useShape();
 
@@ -150,12 +141,10 @@ const InputField = forwardRef<HTMLLabelElement, InputFieldProps>(
 
     const handleFocus = () => {
       setIsFocused(true);
-      setFocusedIndex(index);
     };
 
     const handleBlur = () => {
       setIsFocused(false);
-      setFocusedIndex(null);
     };
 
     // Input container classes

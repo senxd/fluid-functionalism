@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ShapeProvider } from "@/registry/default/lib/shape-context";
 import { ThemeProvider } from "@/registry/default/lib/theme-context";
+import { IconProvider } from "@/registry/default/lib/icon-context";
 import { SidebarLayout } from "@/app/components/sidebar-layout";
 import { DialRoot } from "dialkit";
 
@@ -32,12 +33,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <ShapeProvider defaultShape="rounded">
+        <ShapeProvider defaultShape="pill">
           <ThemeProvider>
-            <SidebarLayout>{children}</SidebarLayout>
-            <DialRoot />
-            <Analytics />
-            <SpeedInsights />
+            <IconProvider>
+              <SidebarLayout>{children}</SidebarLayout>
+              <DialRoot />
+              <Analytics />
+              <SpeedInsights />
+            </IconProvider>
           </ThemeProvider>
         </ShapeProvider>
       </body>

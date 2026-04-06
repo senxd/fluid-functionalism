@@ -53,6 +53,33 @@
       ]
     },
     {
+      "name": "icon-context",
+      "type": "registry:lib",
+      "title": "Icon Context",
+      "description": "React context provider for runtime icon library switching with Lucide fallback.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["icon-map"],
+      "files": [
+        {
+          "path": "registry/default/lib/icon-context.tsx",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "icon-map",
+      "type": "registry:lib",
+      "title": "Icon Map",
+      "description": "Canonical icon name mapping across Lucide, Tabler, Phosphor, and HugeIcons.",
+      "dependencies": ["lucide-react", "@tabler/icons-react", "@phosphor-icons/react", "@hugeicons/react", "@hugeicons/core-free-icons"],
+      "files": [
+        {
+          "path": "registry/default/lib/icon-map.tsx",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
       "name": "use-proximity-hover",
       "type": "registry:hook",
       "title": "useProximityHover",
@@ -79,6 +106,7 @@
         "springs",
         "font-weight",
         "shape-context",
+        "icon-context",
         "use-proximity-hover"
       ],
       "files": [
@@ -113,7 +141,7 @@
         "class-variance-authority",
         "lucide-react"
       ],
-      "registryDependencies": ["utils", "font-weight", "shape-context"],
+      "registryDependencies": ["utils", "font-weight", "shape-context", "icon-context"],
       "files": [
         {
           "path": "registry/default/button.tsx",
@@ -204,6 +232,7 @@
         "utils",
         "springs",
         "shape-context",
+        "icon-context",
         "button"
       ],
       "files": [
@@ -219,7 +248,7 @@
       "title": "Input Copy",
       "description": "Read-only input with a copy-to-clipboard button and animated check feedback. Supports optional label and shape context.",
       "dependencies": ["framer-motion", "lucide-react"],
-      "registryDependencies": ["utils", "springs", "font-weight", "shape-context"],
+      "registryDependencies": ["utils", "springs", "font-weight", "shape-context", "icon-context"],
       "files": [
         {
           "path": "registry/default/input-copy.tsx",
@@ -233,7 +262,7 @@
       "title": "Input Group",
       "description": "Grouped input fields with proximity-based highlighting, animated label transitions, optional icons, and error states.",
       "dependencies": ["lucide-react"],
-      "registryDependencies": ["utils", "font-weight", "shape-context"],
+      "registryDependencies": ["utils", "font-weight", "shape-context", "icon-context"],
       "files": [
         {
           "path": "registry/default/input-group.tsx",
@@ -251,6 +280,7 @@
         "utils",
         "springs",
         "font-weight",
+        "icon-context",
         "use-proximity-hover"
       ],
       "files": [
@@ -318,6 +348,7 @@
         "springs",
         "font-weight",
         "shape-context",
+        "icon-context",
         "use-proximity-hover"
       ],
       "files": [
@@ -369,6 +400,7 @@
         "utils",
         "springs",
         "shape-context",
+        "icon-context",
         "use-proximity-hover"
       ],
       "files": [

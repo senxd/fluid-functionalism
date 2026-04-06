@@ -12,12 +12,11 @@ import {
   Children,
   cloneElement,
   isValidElement,
-  type ReactNode,
   type ComponentPropsWithoutRef,
 } from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { motion, AnimatePresence } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "@/lib/icon-context";
 import { cn } from "@/lib/utils";
 import { springs } from "@/lib/springs";
 import { fontWeights } from "@/lib/font-weight";
@@ -29,6 +28,7 @@ import { useProximityHover } from "@/hooks/use-proximity-hover";
 interface TabsValueOrderContextValue {
   valueOrder: string[];
   setValueOrder: (order: string[]) => void;
+  selectedValue: string | undefined;
 }
 
 const TabsValueOrderContext = createContext<TabsValueOrderContextValue | null>(null);
@@ -80,14 +80,31 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     ref
   ) => {
     const [valueOrder, setValueOrder] = useState<string[]>([]);
+    const [uncontrolledValue, setUncontrolledValue] = useState<string | undefined>(
+      defaultValue
+    );
+    const updateValueOrder = useCallback((order: string[]) => {
+      setValueOrder((current) => {
+        if (
+          current.length === order.length &&
+          current.every((value, index) => value === order[index])
+        ) {
+          return current;
+        }
+        return order;
+      });
+    }, []);
 
     // Resolve value: explicit value > selectedIndex lookup > defaultValue
     const resolvedValue =
       value ??
-      (selectedIndex != null ? valueOrder[selectedIndex] : undefined);
+      (selectedIndex != null ? valueOrder[selectedIndex] : uncontrolledValue);
 
     const handleValueChange = useCallback(
       (newValue: string) => {
+        if (value === undefined && selectedIndex == null) {
+          setUncontrolledValue(newValue);
+        }
         onValueChange?.(newValue);
         if (onSelect) {
           const idx = valueOrder.indexOf(newValue);
@@ -98,7 +115,13 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     );
 
     return (
-      <TabsValueOrderContext.Provider value={{ valueOrder, setValueOrder }}>
+      <TabsValueOrderContext.Provider
+        value={{
+          valueOrder,
+          setValueOrder: updateValueOrder,
+          selectedValue: resolvedValue,
+        }}
+      >
         <TabsPrimitive.Root
           ref={ref}
           value={resolvedValue}
@@ -118,8 +141,7 @@ Tabs.displayName = "Tabs";
 
 /* ─────────────────────── TabsList ─────────────────────── */
 
-interface TabsListProps
-  extends ComponentPropsWithoutRef<typeof TabsPrimitive.List> {}
+type TabsListProps = ComponentPropsWithoutRef<typeof TabsPrimitive.List>;
 
 const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
   ({ children, className, ...props }, ref) => {
@@ -127,18 +149,20 @@ const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
     const isMouseInside = useRef(false);
     const shape = useShape();
     const valueOrderCtx = useContext(TabsValueOrderContext);
+    const [optimisticIdx, setOptimisticIdx] = useState<number | null>(null);
 
     // Derive value order from children synchronously
     const values = Children.toArray(children)
       .filter(isValidElement)
       .map((child) => (child.props as { value?: string }).value)
       .filter((v): v is string => typeof v === "string");
+    const valueOrderKey = values.join(",");
+    const setValueOrder = valueOrderCtx?.setValueOrder;
 
     // Report value order up to Tabs root
     useLayoutEffect(() => {
-      valueOrderCtx?.setValueOrder(values);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [values.join(",")]);
+      setValueOrder?.(values);
+    }, [setValueOrder, valueOrderKey]);
 
     // Proximity hover
     const {
@@ -188,29 +212,20 @@ const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
 
     // Focus ring
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-
-    // Selected index — driven optimistically from TabItem clicks, with a
-    // one-time sync from the DOM on mount for the initial defaultValue.
-    const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-    const hasSynced = useRef(false);
+    const selectedValue = valueOrderCtx?.selectedValue;
+    const selectedIdx =
+      selectedValue !== undefined ? values.indexOf(selectedValue) : -1;
 
     useEffect(() => {
-      if (hasSynced.current) return;
-      const container = containerRef.current;
-      if (!container) return;
-      const triggers = container.querySelectorAll('[role="tab"]');
-      triggers.forEach((trigger, i) => {
-        if (trigger.getAttribute("data-state") === "active") {
-          setSelectedIdx(i);
-        }
-      });
-      hasSynced.current = true;
-    });
+      setOptimisticIdx(selectedIdx >= 0 ? selectedIdx : null);
+    }, [selectedIdx]);
 
-    const selectedRect = selectedIdx != null ? itemRects[selectedIdx] : null;
+    const activeSelectedIdx = optimisticIdx;
+    const selectedRect =
+      activeSelectedIdx !== null ? itemRects[activeSelectedIdx] : null;
     const hoverRect = hoveredIndex !== null ? itemRects[hoveredIndex] : null;
     const focusRect = focusedIndex !== null ? itemRects[focusedIndex] : null;
-    const isHoveringSelected = hoveredIndex === selectedIdx;
+    const isHoveringSelected = hoveredIndex === activeSelectedIdx;
     const isHovering = hoveredIndex !== null && !isHoveringSelected;
 
     // Auto-assign _index to children
@@ -221,13 +236,14 @@ const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
       return child;
     });
 
-    // Read selectedValue for context
-    const selectedValue =
-      selectedIdx != null ? values[selectedIdx] : undefined;
-
     return (
       <TabsListContext.Provider
-        value={{ registerTab, hoveredIndex, selectedValue, setOptimisticIdx: setSelectedIdx }}
+        value={{
+          registerTab,
+          hoveredIndex,
+          selectedValue,
+          setOptimisticIdx,
+        }}
       >
         <TabsPrimitive.List
           ref={(node) => {
@@ -374,7 +390,7 @@ interface TabItemProps
   /** Unique value for this tab. */
   value: string;
   /** Optional leading icon. */
-  icon?: LucideIcon;
+  icon?: IconComponent;
   /** Text label. */
   label: string;
   /** @internal Auto-assigned by TabsList. */

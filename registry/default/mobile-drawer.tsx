@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { springs } from "@/lib/springs";
 
@@ -8,10 +14,33 @@ interface MobileDrawerProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  triggerRef?: RefObject<HTMLElement | null>;
 }
 
-export function MobileDrawer({ open, onClose, children }: MobileDrawerProps) {
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
+export function MobileDrawer({
+  open,
+  onClose,
+  children,
+  triggerRef,
+}: MobileDrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const getFocusableElements = useCallback(() => {
+    if (!panelRef.current) return [];
+    return Array.from(
+      panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+    ).filter((element) => !element.hasAttribute("aria-hidden"));
+  }, []);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -23,25 +52,62 @@ export function MobileDrawer({ open, onClose, children }: MobileDrawerProps) {
     }
   }, [open]);
 
-  // Close on Escape
+  // Focus the drawer, trap keyboard navigation, and restore focus on close
   useEffect(() => {
     if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
 
-  // Focus first focusable element on open
-  useEffect(() => {
-    if (open && panelRef.current) {
-      const first = panelRef.current.querySelector<HTMLElement>(
-        'a, button, [tabindex="0"]'
-      );
-      first?.focus();
-    }
-  }, [open]);
+    const [firstFocusable] = getFocusableElements();
+    (firstFocusable ?? panelRef.current)?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        panelRef.current?.focus();
+        return;
+      }
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (e.shiftKey) {
+        if (
+          activeElement === first ||
+          !panelRef.current?.contains(activeElement)
+        ) {
+          e.preventDefault();
+          last.focus();
+        }
+        return;
+      }
+
+      if (activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      const restoreTarget = triggerRef?.current ?? previousFocusRef.current;
+      restoreTarget?.focus();
+      previousFocusRef.current = null;
+    };
+  }, [getFocusableElements, onClose, open, triggerRef]);
 
   return (
     <AnimatePresence>
@@ -64,6 +130,7 @@ export function MobileDrawer({ open, onClose, children }: MobileDrawerProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"
+            tabIndex={-1}
             className="fixed top-0 left-0 bottom-0 w-64 bg-background z-50 border-r border-border/60 overflow-y-auto p-4"
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}

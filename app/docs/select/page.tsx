@@ -1,16 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Globe,
-  Sun,
-  Moon,
-  Monitor,
-  Mail,
-  Bell,
-  Shield,
-  User,
-} from "lucide-react";
+import { useIcon, type IconComponent } from "@/lib/icon-context";
 import {
   Select,
   SelectTrigger,
@@ -206,7 +197,7 @@ const triggerProps: PropDef[] = [
   },
   {
     name: "icon",
-    type: "LucideIcon",
+    type: "IconComponent",
     description: "Optional icon displayed before the value.",
   },
   {
@@ -235,7 +226,7 @@ const itemProps: PropDef[] = [
   },
   {
     name: "icon",
-    type: "LucideIcon",
+    type: "IconComponent",
     description: "Optional icon displayed before the label.",
   },
   {
@@ -251,6 +242,15 @@ const itemProps: PropDef[] = [
 // ---------------------------------------------------------------------------
 
 export default function SelectDoc() {
+  const Sun = useIcon("sun");
+  const Moon = useIcon("moon");
+  const Monitor = useIcon("monitor");
+  const Mail = useIcon("mail");
+  const Bell = useIcon("bell");
+  const Shield = useIcon("shield");
+  const Globe = useIcon("globe");
+  const User = useIcon("user");
+
   const [basic, setBasic] = useState("");
   const [bordered, setBordered] = useState("");
   const [borderless, setBorderless] = useState("");
@@ -258,7 +258,7 @@ export default function SelectDoc() {
   const [timezone, setTimezone] = useState("");
   const [role, setRole] = useState("");
 
-  const themeIcons: Record<string, typeof Globe> = { light: Sun, dark: Moon, system: Monitor };
+  const themeIcons: Record<string, IconComponent> = { light: Sun, dark: Moon, system: Monitor };
   const ThemeIcon = themeIcons[theme] ?? Monitor;
 
   return (

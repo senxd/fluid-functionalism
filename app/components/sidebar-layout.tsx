@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
 import { Sidebar } from "@/app/components/sidebar";
+import { useIcon } from "@/lib/icon-context";
 import { MobileDrawer } from "@/registry/default/mobile-drawer";
 import { Button } from "@/registry/default/button";
 import { RightPanel, SettingsContent } from "@/app/components/right-panel";
@@ -13,7 +13,9 @@ interface SidebarLayoutProps {
 }
 
 export function SidebarLayout({ children }: SidebarLayoutProps) {
+  const MenuIcon = useIcon("menu");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
   // Close drawer on route change
@@ -30,17 +32,22 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
 
       {/* Mobile hamburger */}
       <Button
+        ref={menuButtonRef}
         variant="ghost"
         size="icon"
         className="md:hidden fixed top-4 left-4 z-50"
         onClick={() => setDrawerOpen(true)}
         aria-label="Open navigation"
       >
-        <Menu />
+        <MenuIcon />
       </Button>
 
       {/* Mobile drawer */}
-      <MobileDrawer open={drawerOpen} onClose={handleClose}>
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={handleClose}
+        triggerRef={menuButtonRef}
+      >
         <Sidebar mobile />
         <div className="mt-auto pt-4">
           <SettingsContent tooltipSide="right" />

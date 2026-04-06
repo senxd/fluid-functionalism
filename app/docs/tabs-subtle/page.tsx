@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SquareLibrary, Clock, Star, Users } from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import {
   TabsSubtle,
   TabsSubtleItem,
@@ -12,6 +12,32 @@ import { PropsTable, type PropDef } from "@/lib/docs/PropsTable";
 import { DocPage, DocSection } from "@/lib/docs/DocPage";
 
 const basicCode = `import { TabsSubtle, TabsSubtleItem, TabsSubtlePanel } from "./components";
+import { useState } from "react";
+
+const tabs = ["Teamspaces", "Recents", "Favorites", "Shared"];
+const [selected, setSelected] = useState(0);
+
+<TabsSubtle
+  idPrefix="demo"
+  selectedIndex={selected}
+  onSelect={setSelected}
+>
+  {tabs.map((label, i) => (
+    <TabsSubtleItem key={label} index={i} label={label} />
+  ))}
+</TabsSubtle>
+{tabs.map((label, i) => (
+  <TabsSubtlePanel
+    key={label}
+    index={i}
+    selectedIndex={selected}
+    idPrefix="demo"
+  >
+    <p>{label} content</p>
+  </TabsSubtlePanel>
+))}`;
+
+const iconsCode = `import { TabsSubtle, TabsSubtleItem, TabsSubtlePanel } from "./components";
 import { SquareLibrary, Clock, Star, Users } from "lucide-react";
 import { useState } from "react";
 
@@ -56,7 +82,7 @@ const tabProps: PropDef[] = [
 ];
 
 const tabItemProps: PropDef[] = [
-  { name: "icon", type: "LucideIcon", description: "Icon displayed in the tab." },
+  { name: "icon", type: "IconComponent", description: "Icon displayed in the tab.", default: "—" },
   { name: "label", type: "string", description: "Text label for the tab." },
   { name: "index", type: "number", description: "Position index within the tab list." },
 ];
@@ -69,13 +95,20 @@ const tabPanelProps: PropDef[] = [
 ];
 
 export default function TabsSubtleDoc() {
+  const SquareLibrary = useIcon("square-library");
+  const Clock = useIcon("clock");
+  const Star = useIcon("star");
+  const Users = useIcon("users");
+
   const tabs = [
     { icon: SquareLibrary, label: "Teamspaces" },
     { icon: Clock, label: "Recents" },
     { icon: Star, label: "Favorites" },
     { icon: Users, label: "Shared" },
   ];
-  const [selected, setSelected] = useState(0);
+  const basicTabs = ["Teamspaces", "Recents", "Favorites", "Shared"];
+  const [basicSelected, setBasicSelected] = useState(0);
+  const [iconsSelected, setIconsSelected] = useState(0);
 
   return (
     <DocPage
@@ -87,9 +120,37 @@ export default function TabsSubtleDoc() {
         <ComponentPreview code={basicCode}>
           <div className="flex flex-col gap-4 w-full">
             <TabsSubtle
-              idPrefix="demo"
-              selectedIndex={selected}
-              onSelect={setSelected}
+              idPrefix="basic-demo"
+              selectedIndex={basicSelected}
+              onSelect={setBasicSelected}
+            >
+              {basicTabs.map((label, i) => (
+                <TabsSubtleItem key={label} index={i} label={label} />
+              ))}
+            </TabsSubtle>
+            {basicTabs.map((label, i) => (
+              <TabsSubtlePanel
+                key={label}
+                index={i}
+                selectedIndex={basicSelected}
+                idPrefix="basic-demo"
+              >
+                <p className="text-[13px] text-muted-foreground px-3">
+                  {label} content goes here.
+                </p>
+              </TabsSubtlePanel>
+            ))}
+          </div>
+        </ComponentPreview>
+      </DocSection>
+
+      <DocSection title="With Icons">
+        <ComponentPreview code={iconsCode}>
+          <div className="flex flex-col gap-4 w-full">
+            <TabsSubtle
+              idPrefix="icons-demo"
+              selectedIndex={iconsSelected}
+              onSelect={setIconsSelected}
             >
               {tabs.map((tab, i) => (
                 <TabsSubtleItem
@@ -104,8 +165,8 @@ export default function TabsSubtleDoc() {
               <TabsSubtlePanel
                 key={tab.label}
                 index={i}
-                selectedIndex={selected}
-                idPrefix="demo"
+                selectedIndex={iconsSelected}
+                idPrefix="icons-demo"
               >
                 <p className="text-[13px] text-muted-foreground px-3">
                   {tab.label} content goes here.

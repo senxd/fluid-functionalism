@@ -133,8 +133,6 @@ function ValueDisplay({
       setInputValue(String(values[editingIndex]));
       requestAnimationFrame(() => inputRef.current?.select());
     }
-    // Only reset input when editingIndex changes (not on every values reference change)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingIndex]);
 
   const commitEdit = useCallback(
@@ -426,7 +424,6 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
       }
       initialSyncDone.current = true;
       setReady(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // --- Track width measurement (resize only) ---

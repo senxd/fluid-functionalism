@@ -19,6 +19,8 @@ const BASE_URL = "https://www.fluidfunctionalism.com/r";
 const CUSTOM_ITEMS = new Set([
   "font-weight",
   "shape-context",
+  "icon-context",
+  "icon-map",
   "springs",
   "use-proximity-hover",
   "button",

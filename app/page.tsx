@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SquareLibrary, Clock, Star, Users, Lock, Search } from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import {
   Dropdown,
 } from "@/registry/default/dropdown";
@@ -48,15 +48,22 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/registry/default/dialog";
-const items = [
-  { icon: SquareLibrary, label: "Teamspaces" },
-  { icon: Clock, label: "Recents" },
-  { icon: Star, label: "Favorites" },
-  { icon: Users, label: "Shared" },
-  { icon: Lock, label: "Private" },
-];
-
 function AppContent() {
+  const SquareLibrary = useIcon("square-library");
+  const Clock = useIcon("clock");
+  const Star = useIcon("star");
+  const Users = useIcon("users");
+  const Lock = useIcon("lock");
+  const Search = useIcon("search");
+
+  const items = [
+    { icon: SquareLibrary, label: "Teamspaces" },
+    { icon: Clock, label: "Recents" },
+    { icon: Star, label: "Favorites" },
+    { icon: Users, label: "Shared" },
+    { icon: Lock, label: "Private" },
+  ];
+
   const [selectedMenuItem, setSelectedMenuItem] = useState<number | null>(0);
   const [selectedTab, setSelectedTab] = useState(0);
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set([0]));

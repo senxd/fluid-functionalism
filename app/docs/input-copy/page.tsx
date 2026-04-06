@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { InputCopy } from "@/registry/default/input-copy";
 import { ComponentPreview } from "@/lib/docs/ComponentPreview";
 import { PropsTable, type PropDef } from "@/lib/docs/PropsTable";
@@ -43,13 +44,18 @@ const disabledCode = `import { InputCopy } from "./components";
   disabled
 />`;
 
-const callbackCode = `import { InputCopy } from "./components";
+const callbackCode = `import { useState } from "react";
+import { InputCopy } from "./components";
+
+const [copyCount, setCopyCount] = useState(0);
 
 <InputCopy
   label="Share link"
   value="https://fluidfunctionalism.com/r/input-copy"
-  onCopy={() => console.log("Copied!")}
-/>`;
+  onCopy={() => setCopyCount((count) => count + 1)}
+/>
+
+<p>Copied {copyCount} times</p>`;
 
 const inputCopyProps: PropDef[] = [
   { name: "value", type: "string", description: "The text value to display and copy to clipboard." },
@@ -61,6 +67,8 @@ const inputCopyProps: PropDef[] = [
 ];
 
 export default function InputCopyDoc() {
+  const [copyCount, setCopyCount] = useState(0);
+
   return (
     <DocPage
       title="InputCopy"
@@ -127,12 +135,15 @@ export default function InputCopyDoc() {
 
       <DocSection title="Copy Callback">
         <ComponentPreview code={callbackCode}>
-          <div className="w-72">
+          <div className="w-72 flex flex-col gap-2">
             <InputCopy
               label="Share link"
               value="https://fluidfunctionalism.com/r/input-copy"
-              onCopy={() => console.log("Copied!")}
+              onCopy={() => setCopyCount((count) => count + 1)}
             />
+            <p className="text-[12px] text-muted-foreground px-1">
+              Copied {copyCount} {copyCount === 1 ? "time" : "times"}
+            </p>
           </div>
         </ComponentPreview>
       </DocSection>

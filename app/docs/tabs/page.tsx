@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SquareLibrary, Clock, Star, Settings } from "lucide-react";
+import { useIcon } from "@/lib/icon-context";
 import { Tabs, TabsList, TabItem, TabPanel } from "@/registry/default/tabs";
 import { ComponentPreview } from "@/lib/docs/ComponentPreview";
 import { PropsTable, type PropDef } from "@/lib/docs/PropsTable";
@@ -74,7 +74,7 @@ const tabsListProps: PropDef[] = [
 
 const tabItemProps: PropDef[] = [
   { name: "value", type: "string", description: "Unique value identifying this tab." },
-  { name: "icon", type: "LucideIcon", description: "Optional leading icon." },
+  { name: "icon", type: "IconComponent", description: "Optional leading icon." },
   { name: "label", type: "string", description: "Text label for the tab." },
 ];
 
@@ -86,6 +86,11 @@ const tabPanelProps: PropDef[] = [
 /* ────────── Page ────────── */
 
 export default function TabsDoc() {
+  const SquareLibrary = useIcon("square-library");
+  const Clock = useIcon("clock");
+  const Star = useIcon("star");
+  const Settings = useIcon("settings");
+
   const [controlled, setControlled] = useState("library");
 
   return (

@@ -8,6 +8,7 @@ import { fontWeights } from "@/registry/default/lib/font-weight";
 import { componentList } from "@/lib/docs/components";
 import { cn } from "@/registry/default/lib/utils";
 
+
 interface SidebarProps {
   mobile?: boolean;
 }
@@ -18,9 +19,9 @@ export function Sidebar({ mobile }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "shrink-0 w-56 border-r border-border/60 overflow-y-auto p-4 flex flex-col gap-4",
+        "shrink-0 w-56 overflow-y-auto p-4 flex flex-col gap-4",
         mobile
-          ? "w-full border-r-0"
+          ? "w-full"
           : "sticky top-0 h-screen hidden md:flex"
       )}
     >
@@ -39,8 +40,9 @@ export function Sidebar({ mobile }: SidebarProps) {
 
       {/* Components section */}
       <div>
-        <span className="text-[13px] text-muted-foreground pl-1 py-4 block">
+        <span className="text-[13px] text-muted-foreground/50 pl-1 pb-1.5 flex items-center gap-2">
           Components
+          <span className="text-[11px]">{componentList.length}</span>
         </span>
         <NavMenu activeSlug={pathname} aria-label="Component navigation">
           {componentList.map((c, i) => (
@@ -49,6 +51,7 @@ export function Sidebar({ mobile }: SidebarProps) {
               index={i}
               href={`/docs/${c.slug}`}
               label={c.name}
+              isNew={c.isNew}
             />
           ))}
         </NavMenu>

@@ -3,7 +3,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import type { LucideIcon } from "lucide-react";
+import type { IconComponent } from "@/lib/icon-context";
 import { cn } from "@/lib/utils";
 import { useShape } from "@/lib/shape-context";
 
@@ -56,8 +56,8 @@ interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
-  leadingIcon?: LucideIcon;
-  trailingIcon?: LucideIcon;
+  leadingIcon?: IconComponent;
+  trailingIcon?: IconComponent;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(

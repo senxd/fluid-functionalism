@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Monitor, Sun, Moon, RectangleHorizontal, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fontWeights } from "@/registry/default/lib/font-weight";
 import { buttonVariants } from "@/registry/default/button";
@@ -17,20 +16,16 @@ import {
   type ShapeVariant,
 } from "@/lib/shape-context";
 import { useThemeContext, type Theme } from "@/registry/default/lib/theme-context";
+import {
+  useIcon,
+  useIconLibrary,
+  iconLibraryOrder,
+  iconLibraryLabels,
+  type IconLibrary,
+} from "@/lib/icon-context";
 import { Tooltip } from "@/registry/default/tooltip";
 
 const REPO = "mickadesign/fluid-functionalism";
-
-const themeOptions: { label: string; value: Theme; icon: typeof Monitor }[] = [
-  { label: "System", value: "system", icon: Monitor },
-  { label: "Light", value: "light", icon: Sun },
-  { label: "Dark", value: "dark", icon: Moon },
-];
-
-const shapeOptions: { label: string; value: ShapeVariant; icon: typeof Monitor }[] = [
-  { label: "Rounded", value: "rounded", icon: RectangleHorizontal },
-  { label: "Pill", value: "pill", icon: Circle },
-];
 
 function formatStars(n: number): string {
   if (n >= 1000) {
@@ -44,8 +39,33 @@ function formatStars(n: number): string {
 export function SettingsContent({ tooltipSide = "left" }: { tooltipSide?: "left" | "right" }) {
   const { theme, setTheme } = useThemeContext();
   const { shape, setShape } = useShapeContext();
+  const { iconLibrary, setIconLibrary } = useIconLibrary();
   const shapeCtx = useShape();
   const [stars, setStars] = useState<number | null>(null);
+
+  const MonitorIcon = useIcon("monitor");
+  const SunIcon = useIcon("sun");
+  const MoonIcon = useIcon("moon");
+  const RectHorizIcon = useIcon("rectangle-horizontal");
+  const CircleIcon = useIcon("circle");
+  const PaletteIcon = useIcon("palette");
+
+  const themeOptions = [
+    { label: "System", value: "system" as Theme, icon: MonitorIcon },
+    { label: "Light", value: "light" as Theme, icon: SunIcon },
+    { label: "Dark", value: "dark" as Theme, icon: MoonIcon },
+  ];
+
+  const shapeOptions = [
+    { label: "Rounded", value: "rounded" as ShapeVariant, icon: RectHorizIcon },
+    { label: "Pill", value: "pill" as ShapeVariant, icon: CircleIcon },
+  ];
+
+  const iconOptions = iconLibraryOrder.map((lib) => ({
+    label: iconLibraryLabels[lib],
+    value: lib,
+    icon: PaletteIcon,
+  }));
 
   useEffect(() => {
     fetch(`https://api.github.com/repos/${REPO}`, {
@@ -62,7 +82,7 @@ export function SettingsContent({ tooltipSide = "left" }: { tooltipSide?: "left"
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Theme & Radius selects */}
+      {/* Theme, Radius & Icons selects */}
       <div className="flex flex-col gap-1.5 py-3">
         <Tooltip content={<span>Press &ensp;<kbd className="font-mono opacity-50">T</kbd>&ensp; to cycle</span>} side={tooltipSide}>
           <div className="flex items-center justify-between px-2">
@@ -94,6 +114,25 @@ export function SettingsContent({ tooltipSide = "left" }: { tooltipSide?: "left"
               />
               <SelectContent>
                 {shapeOptions.map((o, i) => (
+                  <SelectItem key={o.value} value={o.value} index={i} icon={o.icon}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </Tooltip>
+        <Tooltip content={<span>Press &ensp;<kbd className="font-mono opacity-50">I</kbd>&ensp; to cycle</span>} side={tooltipSide}>
+          <div className="flex items-center justify-between px-2">
+            <span className="text-[13px] text-muted-foreground">Icons</span>
+            <Select value={iconLibrary} onValueChange={(v) => setIconLibrary(v as IconLibrary)}>
+              <SelectTrigger
+                variant="borderless"
+                className="min-w-0 w-auto h-7 px-2 text-[13px]"
+                icon={PaletteIcon}
+              />
+              <SelectContent>
+                {iconOptions.map((o, i) => (
                   <SelectItem key={o.value} value={o.value} index={i} icon={o.icon}>
                     {o.label}
                   </SelectItem>
