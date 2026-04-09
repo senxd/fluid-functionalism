@@ -6,6 +6,7 @@ import {
   ThinkingStepsHeader,
   ThinkingStepsContent,
   ThinkingStep,
+  ThinkingStepDetails,
   ThinkingStepSources,
   ThinkingStepSource,
   type StepStatus,
@@ -18,7 +19,7 @@ import { DocPage, DocSection } from "@/lib/docs/DocPage";
 
 const basicCode = `import {
   ThinkingSteps, ThinkingStepsHeader, ThinkingStepsContent,
-  ThinkingStep, ThinkingStepSources, ThinkingStepSource,
+  ThinkingStep, ThinkingStepDetails, ThinkingStepSources, ThinkingStepSource,
 } from "./components";
 
 <ThinkingSteps>
@@ -26,10 +27,17 @@ const basicCode = `import {
   <ThinkingStepsContent>
     <ThinkingStep index={0} icon="search" label="Searched the web" />
     <ThinkingStep index={1} icon="globe" label="Read 3 sources">
-      <ThinkingStepSources>
-        <ThinkingStepSource>github.com</ThinkingStepSource>
-        <ThinkingStepSource>google.com</ThinkingStepSource>
-      </ThinkingStepSources>
+      <ThinkingStepDetails
+        summary="Explored 6 files"
+        details={[
+          "Read accordion.tsx",
+          "Read icon-map.tsx",
+          "Read badge.tsx",
+          "Read use-proximity-hover.ts",
+          "Read components.ts",
+          "Read postbuild-registry.mjs",
+        ]}
+      />
     </ThinkingStep>
     <ThinkingStep index={2} icon="check" label="Done" isLast />
   </ThinkingStepsContent>
@@ -152,6 +160,13 @@ const stepProps: PropDef[] = [
   { name: "index", type: "number", description: "Position index for proximity hover registration." },
   { name: "delay", type: "number", default: "0", description: "Entrance animation delay in seconds." },
   { name: "isLast", type: "boolean", default: "false", description: "Hides the connector line below this step." },
+];
+
+const detailsProps: PropDef[] = [
+  { name: "summary", type: "string", description: "Collapsed label text (e.g. \"Explored 6 files\")." },
+  { name: "details", type: "string[]", description: "Shorthand list of detail lines rendered automatically." },
+  { name: "defaultOpen", type: "boolean", default: "false", description: "Whether the nested accordion starts expanded." },
+  { name: "children", type: "ReactNode", description: "Custom content inside the expanded area." },
 ];
 
 const sourceProps: PropDef[] = [
@@ -308,10 +323,21 @@ function LongDemo({ replayRef }: { replayRef: React.MutableRefObject<(() => void
           index={2}
           icon="globe"
           label="Reading portfolio"
-          description="Found 12 projects across design and engineering."
           status={getStatus(2)}
           isLast={visibleSteps <= 3}
-        />
+        >
+          {visibleSteps > 3 && (
+            <ThinkingStepDetails
+              summary="Explored 4 pages"
+              details={[
+                "Read about.html",
+                "Read projects.html",
+                "Read resume.pdf",
+                "Read contact.html",
+              ]}
+            />
+          )}
+        </ThinkingStep>
         <ThinkingStep
           index={3}
           icon="search"
@@ -419,10 +445,17 @@ export default function ThinkingStepsDoc() {
             <ThinkingStepsContent>
               <ThinkingStep index={0} icon="search" label="Searched the web" />
               <ThinkingStep index={1} icon="globe" label="Read 3 sources">
-                <ThinkingStepSources>
-                  <ThinkingStepSource>github.com</ThinkingStepSource>
-                  <ThinkingStepSource>google.com</ThinkingStepSource>
-                </ThinkingStepSources>
+                <ThinkingStepDetails
+                  summary="Explored 6 files"
+                  details={[
+                    "Read accordion.tsx",
+                    "Read icon-map.tsx",
+                    "Read badge.tsx",
+                    "Read use-proximity-hover.ts",
+                    "Read components.ts",
+                    "Read postbuild-registry.mjs",
+                  ]}
+                />
               </ThinkingStep>
               <ThinkingStep index={2} icon="check" label="Done" isLast />
             </ThinkingStepsContent>
@@ -466,6 +499,9 @@ export default function ThinkingStepsDoc() {
 
         <h3 className="text-[14px] font-semibold text-foreground mb-2 mt-6">ThinkingStep</h3>
         <PropsTable props={stepProps} />
+
+        <h3 className="text-[14px] font-semibold text-foreground mb-2 mt-6">ThinkingStepDetails</h3>
+        <PropsTable props={detailsProps} />
 
         <h3 className="text-[14px] font-semibold text-foreground mb-2 mt-6">ThinkingStepSource</h3>
         <PropsTable props={sourceProps} />

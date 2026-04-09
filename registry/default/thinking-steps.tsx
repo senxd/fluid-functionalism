@@ -206,6 +206,59 @@ function ThinkingStep({
     );
 }
 
+// ─── ThinkingStepDetails (nested accordion) ────────────────────────────────
+
+interface ThinkingStepDetailsProps {
+  summary: string;
+  details?: string[];
+  defaultOpen?: boolean;
+  children?: ReactNode;
+  className?: string;
+}
+
+function ThinkingStepDetails({
+  summary,
+  details,
+  defaultOpen = false,
+  children,
+  className,
+}: ThinkingStepDetailsProps) {
+  const shape = useShape();
+
+  return (
+    <Accordion
+      type="single"
+      collapsible
+      defaultValue={defaultOpen ? "details" : ""}
+      className={cn("mt-1", className)}
+    >
+      <AccordionItem value="details" className="[&>.absolute]:hidden">
+        <AccordionTrigger
+          className={cn(
+            "[&>span:first-child]:flex-none w-auto py-1 px-0 gap-1.5",
+            shape.item
+          )}
+        >
+          {summary}
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="flex flex-col gap-0.5 pt-0.5">
+            {details?.map((item, i) => (
+              <span
+                key={i}
+                className="text-[12px] text-muted-foreground leading-snug"
+              >
+                {item}
+              </span>
+            ))}
+            {children}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+}
+
 // ─── ThinkingStepSources ────────────────────────────────────────────────────
 
 interface ThinkingStepSourcesProps extends HTMLAttributes<HTMLDivElement> {
@@ -302,6 +355,7 @@ export {
   ThinkingStepsHeader,
   ThinkingStepsContent,
   ThinkingStep,
+  ThinkingStepDetails,
   ThinkingStepSources,
   ThinkingStepSource,
   ThinkingStepImage,
@@ -312,6 +366,7 @@ export type {
   ThinkingStepsHeaderProps,
   ThinkingStepsContentProps,
   ThinkingStepProps,
+  ThinkingStepDetailsProps,
   ThinkingStepSourcesProps,
   ThinkingStepSourceProps,
   ThinkingStepImageProps,
