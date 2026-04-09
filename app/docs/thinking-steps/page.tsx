@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { RotateCcw } from "lucide-react";
 import {
   ThinkingSteps,
   ThinkingStepsHeader,
@@ -168,6 +169,23 @@ const imageProps: PropDef[] = [
   { name: "delay", type: "number", default: "0", description: "Entrance animation delay in seconds." },
 ];
 
+// ─── Replay wrapper ─────────────────────────────────────────────────────────
+
+function DemoWithReplay({ onReplay, children }: { onReplay: () => void; children: ReactNode }) {
+  return (
+    <div className="relative w-full">
+      <button
+        onClick={onReplay}
+        className="absolute top-0 right-0 z-20 p-1.5 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-accent/40 transition-colors duration-100 cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-[#6B97FF]"
+        aria-label="Replay animation"
+      >
+        <RotateCcw size={14} strokeWidth={1.5} />
+      </button>
+      {children}
+    </div>
+  );
+}
+
 // ─── Interactive Demos ──────────────────────────────────────────────────────
 
 function StreamingDemo() {
@@ -201,7 +219,7 @@ function StreamingDemo() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <DemoWithReplay onReplay={run}>
       <ThinkingSteps key={key} open={open} onOpenChange={setOpen}>
         <ThinkingStepsHeader />
         <ThinkingStepsContent>
@@ -243,13 +261,7 @@ function StreamingDemo() {
           />
         </ThinkingStepsContent>
       </ThinkingSteps>
-      <button
-        onClick={run}
-        className="text-[12px] text-muted-foreground hover:text-foreground transition-colors self-start px-2 py-1"
-      >
-        Replay
-      </button>
-    </div>
+    </DemoWithReplay>
   );
 }
 
@@ -285,7 +297,7 @@ function LongDemo() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <DemoWithReplay onReplay={run}>
       <ThinkingSteps key={key} open={open} onOpenChange={setOpen}>
         <ThinkingStepsHeader>Research Agent</ThinkingStepsHeader>
         <ThinkingStepsContent>
@@ -352,13 +364,7 @@ function LongDemo() {
           />
         </ThinkingStepsContent>
       </ThinkingSteps>
-      <button
-        onClick={run}
-        className="text-[12px] text-muted-foreground hover:text-foreground transition-colors self-start px-2 py-1"
-      >
-        Replay
-      </button>
-    </div>
+    </DemoWithReplay>
   );
 }
 
@@ -393,7 +399,7 @@ function DotDemo() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <DemoWithReplay onReplay={run}>
       <ThinkingSteps key={key} open={open} onOpenChange={setOpen}>
         <ThinkingStepsHeader />
         <ThinkingStepsContent>
@@ -411,13 +417,7 @@ function DotDemo() {
           <ThinkingStep index={4} showIcon={false} label="Done" status={getStatus(4)} isLast />
         </ThinkingStepsContent>
       </ThinkingSteps>
-      <button
-        onClick={run}
-        className="text-[12px] text-muted-foreground hover:text-foreground transition-colors self-start px-2 py-1"
-      >
-        Replay
-      </button>
-    </div>
+    </DemoWithReplay>
   );
 }
 
