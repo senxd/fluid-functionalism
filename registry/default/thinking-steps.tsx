@@ -244,7 +244,7 @@ function ThinkingStepDetails({
           </AccordionTrigger>
         </div>
         <AccordionContent>
-          <div className="flex flex-col gap-0.5 pt-0.5 pl-3">
+          <div className="flex flex-col gap-0.5 pt-0.5">
             {details?.map((item, i) => (
               <span
                 key={i}
