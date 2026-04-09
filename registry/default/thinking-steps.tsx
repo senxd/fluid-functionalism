@@ -225,18 +225,24 @@ function ThinkingStep({
             data-proximity-index={index}
             className={cn("flex gap-2.5 px-2 py-1.5", shape.item)}
           >
-            {/* Icon */}
-            <div className="shrink-0 pt-0.5">
-              {showIcon ? (
-                <Icon
-                  size={14}
-                  strokeWidth={1.5}
-                  className="text-muted-foreground"
-                />
-              ) : (
-                <div className="w-[14px] h-[14px] flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60" />
-                </div>
+            {/* Icon column with continuous connector line */}
+            <div className="flex flex-col items-center shrink-0 w-[14px]">
+              <div className="pt-0.5">
+                {showIcon ? (
+                  <Icon
+                    size={14}
+                    strokeWidth={1.5}
+                    className="text-muted-foreground"
+                  />
+                ) : (
+                  <div className="w-[14px] h-[14px] flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60" />
+                  </div>
+                )}
+              </div>
+              {/* Line stretches from icon to bottom of this step */}
+              {!isLast && (
+                <div className="flex-1 w-px bg-border/60 mt-1" />
               )}
             </div>
 
@@ -260,15 +266,6 @@ function ThinkingStep({
               {children}
             </div>
           </div>
-
-          {/* Connector line — outside hover target */}
-          {!isLast && (
-            <div className="flex pl-2 py-0">
-              <div className="w-[14px] flex justify-center">
-                <div className="w-px h-2 bg-border/60" />
-              </div>
-            </div>
-          )}
         </motion.div>
       </motion.div>
     );
