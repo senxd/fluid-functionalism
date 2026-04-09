@@ -409,7 +409,18 @@ function DotDemo({ replayRef }: { replayRef: React.MutableRefObject<(() => void)
       <ThinkingStepsHeader />
       <ThinkingStepsContent>
         <ThinkingStep index={0} showIcon={false} label="Parsed the query" status={getStatus(0)} isLast={visibleSteps <= 1} />
-        <ThinkingStep index={1} showIcon={false} label="Retrieved context" status={getStatus(1)} isLast={visibleSteps <= 2} />
+        <ThinkingStep index={1} showIcon={false} label="Retrieved context" status={getStatus(1)} isLast={visibleSteps <= 2}>
+          {visibleSteps > 2 && (
+            <ThinkingStepDetails
+              summary="Explored 1 search, 1 list, ran 1 command"
+              details={[
+                "Searched codebase for references",
+                "Listed directory contents",
+                "Ran type checker",
+              ]}
+            />
+          )}
+        </ThinkingStep>
         <ThinkingStep index={2} showIcon={false} label="Searching for references" status={getStatus(2)} isLast={visibleSteps <= 3}>
           {visibleSteps > 3 && (
             <ThinkingStepSources>

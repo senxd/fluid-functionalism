@@ -230,19 +230,21 @@ function ThinkingStepDetails({
       type="single"
       collapsible
       defaultValue={defaultOpen ? "details" : ""}
-      className={cn("mt-1", className)}
+      className={cn("mt-1 -ml-3", className)}
     >
       <AccordionItem value="details" className="[&>.absolute]:hidden">
-        <AccordionTrigger
-          className={cn(
-            "[&>span:first-child]:flex-none w-auto py-1 px-0 gap-1.5",
-            shape.item
-          )}
-        >
-          {summary}
-        </AccordionTrigger>
+        <div className="w-fit">
+          <AccordionTrigger
+            className={cn(
+              "[&>span:first-child]:flex-none w-auto py-1 px-3 gap-1.5",
+              shape.item
+            )}
+          >
+            {summary}
+          </AccordionTrigger>
+        </div>
         <AccordionContent>
-          <div className="flex flex-col gap-0.5 pt-0.5">
+          <div className="flex flex-col gap-0.5 pt-0.5 pl-3">
             {details?.map((item, i) => (
               <span
                 key={i}
