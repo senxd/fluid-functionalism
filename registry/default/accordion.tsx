@@ -52,6 +52,7 @@ interface AccordionItemContextValue {
   value: string;
   isOpen: boolean;
   onToggle: () => void;
+  triggerRef: React.MutableRefObject<HTMLDivElement | null>;
 }
 
 const AccordionItemContext =
@@ -337,7 +338,10 @@ const AccordionGroup = forwardRef<HTMLDivElement, AccordionGroupProps>(
                   }}
                   exit={{ opacity: 0, transition: { duration: 0.12 } }}
                   transition={{
-                    ...springs.moderate,
+                    top: { duration: 0 },
+                    left: { duration: 0 },
+                    width: { duration: 0 },
+                    height: { duration: 0 },
                     opacity: { duration: 0.08 },
                   }}
                 />
@@ -551,6 +555,8 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
       ? groupCtx.openValues.has(value)
       : standaloneOpen.has(value);
 
+    const triggerRef = useRef<HTMLDivElement>(null);
+
     const onToggle = useCallback(() => {
       if (groupCtx?.grouped) {
         groupCtx.toggleValue(value);
@@ -559,10 +565,10 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
       }
     }, [groupCtx, standaloneToggle, value]);
 
-    // Register full item element for proximity hover (covers trigger + content)
+    // Register trigger element (not full item) for proximity hover
     useEffect(() => {
       if (groupCtx?.grouped && index !== undefined) {
-        groupCtx.registerItem(index, internalRef.current);
+        groupCtx.registerItem(index, triggerRef.current);
         return () => groupCtx.registerItem(index, null);
       }
     }, [index, groupCtx]);
@@ -580,7 +586,7 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
     }, [index, groupCtx, isOpen]);
 
     return (
-      <AccordionItemContext.Provider value={{ index, value, isOpen, onToggle }}>
+      <AccordionItemContext.Provider value={{ index, value, isOpen, onToggle, triggerRef }}>
         <AccordionPrimitive.Item
           ref={(node) => {
             (
@@ -595,7 +601,7 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
           value={value}
           disabled={disabled}
           data-proximity-index={index}
-          className={cn("relative", className)}
+          className={cn(!groupCtx?.grouped && "relative", className)}
           {...props}
         >
           {/* Standalone expanded background */}
@@ -632,7 +638,7 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
   ({ children, className, ...props }, ref) => {
     const ChevronRight = useIcon("chevron-right");
     const groupCtx = useAccordionGroup();
-    const { index, isOpen } = useAccordionItemContext();
+    const { index, isOpen, triggerRef } = useAccordionItemContext();
     const shape = useShape();
     const [isHovered, setIsHovered] = useState(false);
 
@@ -700,9 +706,9 @@ const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerProps>(
       </AccordionPrimitive.Header>
     );
 
-    // In grouped mode, return trigger directly (item registration handled by AccordionItem)
+    // In grouped mode, wrap in a div for proximity hover registration
     if (groupCtx?.grouped) {
-      return triggerContent;
+      return <div ref={triggerRef}>{triggerContent}</div>;
     }
 
     // Standalone mode: local hover with animated BG
