@@ -6,6 +6,7 @@ import { Button } from "@/registry/default/button";
 import { useIcon } from "@/lib/icon-context";
 import { componentList } from "@/lib/docs/components";
 import { InputCopy } from "@/registry/default/input-copy";
+import { Tooltip } from "@/registry/default/tooltip";
 
 export default function DocsIndex() {
   const ArrowRight = useIcon("arrow-right");
@@ -30,11 +31,13 @@ export default function DocsIndex() {
             <ArrowRight className="rotate-180" />
           </Button>
           {firstComponent && (
-            <Link href={`/docs/${firstComponent.slug}`} aria-label={`Next: ${firstComponent.name}`} className="outline-none" tabIndex={-1}>
-              <Button variant="ghost" size="icon">
-                <ArrowRight />
-              </Button>
-            </Link>
+            <Tooltip content={<span>{firstComponent.name} &ensp;<kbd className="font-mono opacity-50">&rarr;</kbd></span>}>
+              <Link href={`/docs/${firstComponent.slug}`} aria-label={`Next: ${firstComponent.name}`} className="outline-none" tabIndex={-1}>
+                <Button variant="ghost" size="icon">
+                  <ArrowRight />
+                </Button>
+              </Link>
+            </Tooltip>
           )}
         </div>
       </div>

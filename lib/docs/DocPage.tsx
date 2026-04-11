@@ -7,6 +7,7 @@ import { InputCopy } from "@/registry/default/input-copy";
 import { Button } from "@/registry/default/button";
 import { useIcon } from "@/lib/icon-context";
 import { componentList } from "@/lib/docs/components";
+import { Tooltip } from "@/registry/default/tooltip";
 
 interface DocPageProps {
   title: string;
@@ -41,22 +42,26 @@ export function DocPage({ title, description, slug, children }: DocPageProps) {
         {slug && (
           <div className="flex items-center gap-1 shrink-0">
             {prev ? (
-              <Link href={`/docs/${prev.slug}`} aria-label={`Previous: ${prev.name}`} className="outline-none" tabIndex={-1}>
-                <Button variant="ghost" size="icon">
-                  <ArrowRight className="rotate-180" />
-                </Button>
-              </Link>
+              <Tooltip content={<span>{prev.name} &ensp;<kbd className="font-mono opacity-50">&larr;</kbd></span>}>
+                <Link href={`/docs/${prev.slug}`} aria-label={`Previous: ${prev.name}`} className="outline-none" tabIndex={-1}>
+                  <Button variant="ghost" size="icon">
+                    <ArrowRight className="rotate-180" />
+                  </Button>
+                </Link>
+              </Tooltip>
             ) : (
               <Button variant="ghost" size="icon" disabled aria-label="No previous component">
                 <ArrowRight className="rotate-180" />
               </Button>
             )}
             {next ? (
-              <Link href={`/docs/${next.slug}`} aria-label={`Next: ${next.name}`} className="outline-none" tabIndex={-1}>
-                <Button variant="ghost" size="icon">
-                  <ArrowRight />
-                </Button>
-              </Link>
+              <Tooltip content={<span>{next.name} &ensp;<kbd className="font-mono opacity-50">&rarr;</kbd></span>}>
+                <Link href={`/docs/${next.slug}`} aria-label={`Next: ${next.name}`} className="outline-none" tabIndex={-1}>
+                  <Button variant="ghost" size="icon">
+                    <ArrowRight />
+                  </Button>
+                </Link>
+              </Tooltip>
             ) : (
               <Button variant="ghost" size="icon" disabled aria-label="No next component">
                 <ArrowRight />
