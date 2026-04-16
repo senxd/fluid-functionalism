@@ -341,22 +341,13 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
       return () => document.removeEventListener("mousedown", onPointer);
     }, [open, setOpen, triggerRef]);
 
-    // Lock body scroll while open (matches Radix Select behavior)
+    // Close on scroll (instead of locking body scroll, which causes layout shift)
     useEffect(() => {
       if (!open) return;
-      const scrollY = window.scrollY;
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      return () => {
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        window.scrollTo(0, scrollY);
-      };
-    }, [open]);
+      const onScroll = () => setOpen(false);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
+    }, [open, setOpen]);
 
     // Keyboard nav inside content
     const handleKeyDown = useCallback(
