@@ -74,10 +74,39 @@ const [selected, setSelected] = useState(0);
   </TabsSubtlePanel>
 ))}`;
 
+const activeLabelCode = `import { TabsSubtle, TabsSubtleItem, TabsSubtlePanel } from "./components";
+import { SquareLibrary, Clock, Star, Users } from "lucide-react";
+import { useState } from "react";
+
+const tabs = [
+  { icon: SquareLibrary, label: "Teamspaces" },
+  { icon: Clock, label: "Recents" },
+  { icon: Star, label: "Favorites" },
+  { icon: Users, label: "Shared" },
+];
+const [selected, setSelected] = useState(0);
+
+<TabsSubtle
+  activeLabel
+  idPrefix="demo"
+  selectedIndex={selected}
+  onSelect={setSelected}
+>
+  {tabs.map((tab, i) => (
+    <TabsSubtleItem
+      key={tab.label}
+      index={i}
+      icon={tab.icon}
+      label={tab.label}
+    />
+  ))}
+</TabsSubtle>`;
+
 const tabProps: PropDef[] = [
   { name: "selectedIndex", type: "number", description: "Index of the currently selected tab." },
   { name: "onSelect", type: "(index: number) => void", description: "Called when a tab is selected." },
   { name: "idPrefix", type: "string", description: "Prefix for ARIA IDs linking tabs to panels." },
+  { name: "activeLabel", type: "boolean", default: "false", description: "When true, only the selected tab shows its text label. Requires icons on tabs." },
   { name: "children", type: "ReactNode", description: "TabsSubtleItem children." },
 ];
 
@@ -109,6 +138,7 @@ export default function TabsSubtleDoc() {
   const basicTabs = ["Teamspaces", "Recents", "Favorites", "Shared"];
   const [basicSelected, setBasicSelected] = useState(0);
   const [iconsSelected, setIconsSelected] = useState(0);
+  const [activeLabelSelected, setActiveLabelSelected] = useState(0);
 
   return (
     <DocPage
@@ -167,6 +197,40 @@ export default function TabsSubtleDoc() {
                 index={i}
                 selectedIndex={iconsSelected}
                 idPrefix="icons-demo"
+              >
+                <p className="text-[13px] text-muted-foreground px-3">
+                  {tab.label} content goes here.
+                </p>
+              </TabsSubtlePanel>
+            ))}
+          </div>
+        </ComponentPreview>
+      </DocSection>
+
+      <DocSection title="Active Label">
+        <ComponentPreview code={activeLabelCode}>
+          <div className="flex flex-col gap-4 w-full">
+            <TabsSubtle
+              activeLabel
+              idPrefix="active-label-demo"
+              selectedIndex={activeLabelSelected}
+              onSelect={setActiveLabelSelected}
+            >
+              {tabs.map((tab, i) => (
+                <TabsSubtleItem
+                  key={tab.label}
+                  index={i}
+                  icon={tab.icon}
+                  label={tab.label}
+                />
+              ))}
+            </TabsSubtle>
+            {tabs.map((tab, i) => (
+              <TabsSubtlePanel
+                key={tab.label}
+                index={i}
+                selectedIndex={activeLabelSelected}
+                idPrefix="active-label-demo"
               >
                 <p className="text-[13px] text-muted-foreground px-3">
                   {tab.label} content goes here.

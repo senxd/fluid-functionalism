@@ -26,6 +26,7 @@ interface TabsSubtleContextValue {
   selectedIndex: number;
   onSelect: (index: number) => void;
   idPrefix: string;
+  activeLabel: boolean;
 }
 
 const TabsSubtleContext = createContext<TabsSubtleContextValue | null>(null);
@@ -41,10 +42,12 @@ interface TabsSubtleProps extends Omit<HTMLAttributes<HTMLDivElement>, "onSelect
   selectedIndex: number;
   onSelect: (index: number) => void;
   idPrefix?: string;
+  /** When true, only the selected tab shows its text label. Requires icons on tabs. */
+  activeLabel?: boolean;
 }
 
 const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
-  ({ children, selectedIndex, onSelect, idPrefix: idPrefixProp, className, ...props }, ref) => {
+  ({ children, selectedIndex, onSelect, idPrefix: idPrefixProp, activeLabel = false, className, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const isMouseInside = useRef(false);
     const generatedId = useId();
@@ -56,12 +59,35 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
       setActiveIndex: setHoveredIndex,
       itemRects: tabRects,
       handlers,
-      registerItem: registerTab,
+      registerItem,
       measureItems: measureTabs,
     } = useProximityHover(containerRef, { axis: "x" });
 
+    // Track tab elements locally so we can observe their individual resizes
+    const tabElementsRef = useRef(new Map<number, HTMLElement>());
+    const registerTab = useCallback(
+      (index: number, element: HTMLElement | null) => {
+        registerItem(index, element);
+        if (element) {
+          tabElementsRef.current.set(index, element);
+        } else {
+          tabElementsRef.current.delete(index);
+        }
+      },
+      [registerItem]
+    );
+
     useEffect(() => {
       measureTabs();
+    }, [measureTabs, children]);
+
+    // Observe individual tab buttons for resize (label expand/collapse in activeLabel mode)
+    useEffect(() => {
+      const elements = tabElementsRef.current;
+      if (elements.size === 0) return;
+      const ro = new ResizeObserver(() => measureTabs());
+      elements.forEach((el) => ro.observe(el));
+      return () => ro.disconnect();
     }, [measureTabs, children]);
 
     // Wrap handlers to track isMouseInside
@@ -89,7 +115,7 @@ const TabsSubtle = forwardRef<HTMLDivElement, TabsSubtleProps>(
 
     return (
       <TabsSubtleContext.Provider
-        value={{ registerTab, hoveredIndex, selectedIndex, onSelect, idPrefix }}
+        value={{ registerTab, hoveredIndex, selectedIndex, onSelect, idPrefix, activeLabel }}
       >
         <div
           ref={(node) => {
@@ -243,7 +269,7 @@ const TabsSubtleItem = forwardRef<HTMLButtonElement, TabsSubtleItemProps>(
   ({ icon: Icon, label, index, className, ...props }, ref) => {
     const internalRef = useRef<HTMLButtonElement>(null);
     const shape = useShape();
-    const { registerTab, hoveredIndex, selectedIndex, onSelect, idPrefix } =
+    const { registerTab, hoveredIndex, selectedIndex, onSelect, idPrefix, activeLabel } =
       useTabsSubtle();
 
     useEffect(() => {
@@ -251,7 +277,35 @@ const TabsSubtleItem = forwardRef<HTMLButtonElement, TabsSubtleItemProps>(
       return () => registerTab(index, null);
     }, [index, registerTab]);
 
-    const isActive = hoveredIndex === index || selectedIndex === index;
+    const isSelected = selectedIndex === index;
+    const isActive = hoveredIndex === index || isSelected;
+    const collapseLabel = activeLabel && !!Icon;
+    const showLabel = !collapseLabel || isSelected;
+
+    const labelContent = (
+      <span className="inline-grid text-[13px] whitespace-nowrap">
+        <span
+          className="col-start-1 row-start-1 invisible"
+          style={{ fontVariationSettings: fontWeights.semibold }}
+          aria-hidden="true"
+        >
+          {label}
+        </span>
+        <span
+          className={cn(
+            "col-start-1 row-start-1 transition-[color,font-variation-settings] duration-80",
+            isActive ? "text-foreground" : "text-muted-foreground"
+          )}
+          style={{
+            fontVariationSettings: isSelected
+              ? fontWeights.semibold
+              : fontWeights.normal,
+          }}
+        >
+          {label}
+        </span>
+      </span>
+    );
 
     return (
       <button
@@ -263,12 +317,14 @@ const TabsSubtleItem = forwardRef<HTMLButtonElement, TabsSubtleItemProps>(
         data-proximity-index={index}
         id={`${idPrefix}-tab-${index}`}
         role="tab"
-        aria-selected={selectedIndex === index}
+        aria-selected={isSelected}
         aria-controls={`${idPrefix}-panel-${index}`}
-        tabIndex={selectedIndex === index ? 0 : -1}
+        aria-label={collapseLabel && !showLabel ? label : undefined}
+        tabIndex={isSelected ? 0 : -1}
         onClick={() => onSelect(index)}
         className={cn(
-          "relative z-10 flex items-center gap-2 px-3 py-2 cursor-pointer bg-transparent border-none outline-none",
+          "relative z-10 flex items-center px-3 py-2 cursor-pointer bg-transparent border-none outline-none",
+          !collapseLabel && "gap-2",
           shape.bg,
           className
         )}
@@ -279,34 +335,32 @@ const TabsSubtleItem = forwardRef<HTMLButtonElement, TabsSubtleItemProps>(
             size={16}
             strokeWidth={isActive ? 2 : 1.5}
             className={cn(
-              "transition-[color,stroke-width] duration-80",
+              "shrink-0 transition-[color,stroke-width] duration-80",
               isActive ? "text-foreground" : "text-muted-foreground"
             )}
           />
         )}
-        <span className="inline-grid text-[13px] whitespace-nowrap">
-          <span
-            className="col-start-1 row-start-1 invisible"
-            style={{ fontVariationSettings: fontWeights.semibold }}
-            aria-hidden="true"
-          >
-            {label}
-          </span>
-          <span
-            className={cn(
-              "col-start-1 row-start-1 transition-[color,font-variation-settings] duration-80",
-              isActive ? "text-foreground" : "text-muted-foreground"
+        {collapseLabel ? (
+          <AnimatePresence initial={false}>
+            {showLabel && (
+              <motion.span
+                key="label"
+                className="overflow-hidden"
+                initial={{ width: 0, opacity: 0, marginLeft: 0 }}
+                animate={{ width: "auto", opacity: 1, marginLeft: 8 }}
+                exit={{ width: 0, opacity: 0, marginLeft: 0 }}
+                transition={{
+                  ...springs.fast,
+                  opacity: { duration: 0.06 },
+                }}
+              >
+                {labelContent}
+              </motion.span>
             )}
-            style={{
-              fontVariationSettings:
-                selectedIndex === index
-                  ? fontWeights.semibold
-                  : fontWeights.normal,
-            }}
-          >
-            {label}
-          </span>
-        </span>
+          </AnimatePresence>
+        ) : (
+          labelContent
+        )}
       </button>
     );
   }
