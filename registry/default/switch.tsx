@@ -8,16 +8,23 @@ import {
   useCallback,
   type HTMLAttributes,
 } from "react";
-import { motion, useMotionValue, animate } from "framer-motion";
+import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { cn } from "@/lib/utils";
 import { springs } from "@/lib/springs";
+
+type SwitchVariant = "pill" | "checkbox";
 
 interface SwitchProps extends HTMLAttributes<HTMLDivElement> {
   label: string;
   checked: boolean;
   onToggle: () => void;
   disabled?: boolean;
+  /** Visual variant. `pill` (default) is the sliding toggle; `checkbox` renders a square with a check mark (shared visual with CheckboxGroup). */
+  variant?: SwitchVariant;
+  /** Hide the label text visually; still read by screen readers. */
+  hideLabel?: boolean;
 }
 
 const TRACK_WIDTH = 34;
@@ -31,10 +38,142 @@ const PRESS_SHRINK = 4;
 const DRAG_DEAD_ZONE = 2;
 
 const Switch = forwardRef<HTMLDivElement, SwitchProps>(
-  ({ label, checked, onToggle, disabled = false, className, ...props }, ref) => {
+  (
+    {
+      label,
+      checked,
+      onToggle,
+      disabled = false,
+      variant = "pill",
+      hideLabel = false,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
     const hasMounted = useRef(false);
     const [hovered, setHovered] = useState(false);
     const [pressed, setPressed] = useState(false);
+
+    useEffect(() => {
+      hasMounted.current = true;
+    }, []);
+
+    // ── Checkbox variant — shares visual language with CheckboxGroup/CheckboxItem ──
+    if (variant === "checkbox") {
+      return (
+        <div
+          ref={ref}
+          role="button"
+          tabIndex={0}
+          aria-disabled={disabled}
+          onKeyDown={(e) => {
+            if (disabled) return;
+            if (e.key === " " || e.key === "Enter") {
+              e.preventDefault();
+              onToggle();
+            }
+          }}
+          onClick={(e) => {
+            if (disabled) return;
+            e.stopPropagation();
+            onToggle();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          className={cn(
+            "inline-flex items-center gap-2 cursor-pointer select-none outline-none",
+            "focus-visible:ring-1 focus-visible:ring-[#6B97FF] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-[6px]",
+            disabled && "opacity-50 pointer-events-none",
+            className,
+          )}
+          onPointerEnter={() => setHovered(true)}
+          onPointerLeave={() => setHovered(false)}
+          {...props}
+        >
+          <CheckboxPrimitive.Root
+            checked={checked}
+            onCheckedChange={() => onToggle()}
+            tabIndex={-1}
+            aria-hidden
+            className="relative w-[18px] h-[18px] shrink-0 appearance-none bg-transparent p-0 border-0 outline-none cursor-pointer"
+          >
+            <motion.div
+              key={checked ? "on" : "off"}
+              className={cn(
+                "absolute inset-0 rounded-[5px] border-solid",
+                checked
+                  ? "border-[1.5px] border-transparent bg-[#6B97FF]"
+                  : hovered
+                    ? "border-[1.5px] border-neutral-400 dark:border-neutral-500"
+                    : "border-[1.5px] border-border",
+              )}
+              initial={{ scale: checked ? 0.6 : 1 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 700,
+                damping: 14,
+                mass: 0.9,
+              }}
+            />
+            <AnimatePresence>
+              {checked && (
+                <CheckboxPrimitive.Indicator forceMount asChild>
+                  <motion.svg
+                    width={18}
+                    height={18}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="absolute inset-0 text-white"
+                    initial={{ opacity: 1, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 1, scale: 0.5 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 700,
+                      damping: 16,
+                      mass: 0.6,
+                    }}
+                  >
+                    <motion.path
+                      d="M6 12L10 16L18 8"
+                      initial={{ pathLength: hasMounted.current ? 0 : 1 }}
+                      animate={{
+                        pathLength: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 22,
+                          mass: 0.5,
+                          delay: 0.04,
+                        },
+                      }}
+                      exit={{
+                        pathLength: 0,
+                        transition: { duration: 0.06, ease: "easeIn" },
+                      }}
+                    />
+                  </motion.svg>
+                </CheckboxPrimitive.Indicator>
+              )}
+            </AnimatePresence>
+          </CheckboxPrimitive.Root>
+          <span
+            className={cn(
+              "text-[13px] transition-[color] duration-80",
+              hideLabel && "sr-only",
+              checked ? "text-foreground" : "text-muted-foreground",
+            )}
+          >
+            {label}
+          </span>
+        </div>
+      );
+    }
 
     // Drag refs (not state to avoid re-renders during drag)
     const dragging = useRef(false);
@@ -48,10 +187,6 @@ const Switch = forwardRef<HTMLDivElement, SwitchProps>(
     const motionX = useMotionValue(
       checked ? THUMB_OFFSET + THUMB_TRAVEL : THUMB_OFFSET
     );
-
-    useEffect(() => {
-      hasMounted.current = true;
-    }, []);
 
     // Compute thumb shape
     const thumbWidth = pressed

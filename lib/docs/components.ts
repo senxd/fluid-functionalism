@@ -13,6 +13,7 @@ export const componentList: ComponentEntry[] = [
   { slug: "checkbox-group", name: "CheckboxGroup", description: "Checkbox group with merged backgrounds for contiguous selections.", gridSize: "small" },
   { slug: "dialog", name: "Dialog", description: "Modal dialog with smooth enter/exit animations and overlay.", gridSize: "small" },
   { slug: "dropdown", name: "Dropdown", description: "Menu-style dropdown with proximity hover and animated backgrounds.", gridSize: "medium" },
+  { slug: "graph", name: "Graph", description: "Line graph with dotted grid, gradient area fill, overlay reference series, and hover scrubbing.", isNew: true, gridSize: "large" },
   { slug: "input-copy", name: "InputCopy", description: "Read-only input with copy-to-clipboard button and animated feedback.", isNew: true, gridSize: "small" },
   { slug: "input-group", name: "InputGroup", description: "Input field group with proximity hover and validation.", gridSize: "medium" },
   { slug: "radio-group", name: "RadioGroup", description: "Radio button group with proximity hover and animated selection.", gridSize: "small" },

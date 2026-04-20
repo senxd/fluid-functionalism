@@ -437,6 +437,20 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "graph",
+      "type": "registry:ui",
+      "title": "Graph",
+      "description": "Line graph with dotted grid background, gradient area fill, overlay reference series, hover scrubbing, range selector, annotations, and sparkline mode.",
+      "dependencies": ["framer-motion"],
+      "registryDependencies": ["utils", "springs", "font-weight", "shape-context", "tabs-subtle"],
+      "files": [
+        {
+          "path": "registry/default/graph.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
