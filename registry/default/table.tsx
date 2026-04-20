@@ -1602,25 +1602,28 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
             >
               {selection && (
                 <th
-                  className="text-left"
+                  className="text-left align-middle"
                   style={{
                     padding: `var(--cell-py) var(--cell-px)`,
                     width: 34,
+                    verticalAlign: "middle",
                   }}
                 >
-                  <Switch
-                    variant="checkbox"
-                    hideLabel
-                    label={
-                      allSelected
-                        ? "Deselect all rows"
-                        : someSelected
+                  <div className="flex items-center justify-start leading-none">
+                    <Switch
+                      variant="checkbox"
+                      hideLabel
+                      label={
+                        allSelected
                           ? "Deselect all rows"
-                          : "Select all rows"
-                    }
-                    checked={allSelected}
-                    onToggle={toggleAll}
-                  />
+                          : someSelected
+                            ? "Deselect all rows"
+                            : "Select all rows"
+                      }
+                      checked={allSelected}
+                      onToggle={toggleAll}
+                    />
+                  </div>
                 </th>
               )}
               {visibleColumns.map((col) => {
@@ -1865,15 +1868,18 @@ function BodyRow<T>({
             e.stopPropagation();
             e.nativeEvent.stopImmediatePropagation();
           }}
-          style={{ padding: "var(--cell-py) var(--cell-px)" }}
+          className="align-middle"
+          style={{ padding: "var(--cell-py) var(--cell-px)", verticalAlign: "middle" }}
         >
-          <Switch
-            variant="checkbox"
-            hideLabel
-            label={isSelected ? "Deselect row" : "Select row"}
-            checked={isSelected}
-            onToggle={toggleRow}
-          />
+          <div className="flex items-center justify-start leading-none">
+            <Switch
+              variant="checkbox"
+              hideLabel
+              label={isSelected ? "Deselect row" : "Select row"}
+              checked={isSelected}
+              onToggle={toggleRow}
+            />
+          </div>
         </td>
       )}
       {columns.map((col) => {
