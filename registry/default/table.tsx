@@ -178,6 +178,12 @@ interface TableProps<T = Record<string, unknown>>
   children?: ReactNode;
 }
 
+interface IndexedRow<T> {
+  id: string;
+  row: T;
+  sourceIndex: number;
+}
+
 // ---------------------------------------------------------------------------
 // Size / density config
 // ---------------------------------------------------------------------------
@@ -1183,6 +1189,28 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
   const shape = useShape();
   const cfg = SIZE_CONFIG[size];
   const visibleColumns = useMemo(() => columns.filter((c) => !c.hidden), [columns]);
+  const columnById = useMemo(
+    () => new Map(visibleColumns.map((column) => [column.id, column])),
+    [visibleColumns],
+  );
+  const searchableColumns = useMemo(
+    () =>
+      visibleColumns.filter(
+        (column) =>
+          column.searchable !== false &&
+          (column.cellType == null ||
+            column.cellType === "text" ||
+            column.cellType === "link" ||
+            column.cellType === "badge" ||
+            column.cellType === "chip" ||
+            column.searchable === true),
+      ),
+    [visibleColumns],
+  );
+  const filterableColumns = useMemo(
+    () => visibleColumns.filter((column) => column.filter),
+    [visibleColumns],
+  );
 
   // Proximity hover on body rows
   const proxContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1236,86 +1264,108 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
     setSelectedState(ids);
     onSelectionChange?.(ids);
   };
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const sourceRows = useMemo<IndexedRow<T>[]>(
+    () =>
+      data.map((row, sourceIndex) => ({
+        id: getRowId ? getRowId(row, sourceIndex) : String(sourceIndex),
+        row,
+        sourceIndex,
+      })),
+    [data, getRowId],
+  );
+  const filterEntries = useMemo(
+    () => Object.entries(filters) as [string, TableFilterValue][],
+    [filters],
+  );
+  const upstreamFilterIds = useMemo(() => {
+    const resolved = new Map<string, Set<string>>();
+    const visiting = new Set<string>();
+    const warnedCycles = new Set<string>();
 
-  const rowId = useCallback(
-    (row: T, i: number): string => (getRowId ? getRowId(row, i) : String(i)),
-    [getRowId],
+    const visit = (columnId: string): Set<string> => {
+      const cached = resolved.get(columnId);
+      if (cached) return cached;
+
+      if (visiting.has(columnId)) {
+        if (!warnedCycles.has(columnId) && typeof console !== "undefined") {
+          console.warn(`[Table] dependsOn cycle involving column "${columnId}"`);
+          warnedCycles.add(columnId);
+        }
+        return new Set();
+      }
+
+      visiting.add(columnId);
+      const ids = new Set<string>();
+      for (const upstreamId of columnById.get(columnId)?.filter?.dependsOn ?? []) {
+        ids.add(upstreamId);
+        for (const nestedId of visit(upstreamId)) {
+          ids.add(nestedId);
+        }
+      }
+      visiting.delete(columnId);
+      resolved.set(columnId, ids);
+      return ids;
+    };
+
+    for (const column of visibleColumns) {
+      visit(column.id);
+    }
+
+    return resolved;
+  }, [columnById, visibleColumns]);
+  const sortColumns = useMemo(
+    () =>
+      sort.flatMap((entry) => {
+        const column = columnById.get(entry.id);
+        return column ? [{ entry, column }] : [];
+      }),
+    [sort, columnById],
   );
 
-  // ── dependsOn order (topological) ─────────────────────────
-  const upstreamsFor = useMemo(() => {
-    const map = new Map<string, string[]>();
-    for (const c of visibleColumns) {
-      map.set(c.id, c.filter?.dependsOn ?? []);
-    }
-    return map;
-  }, [visibleColumns]);
-
   // Compute rows passing upstream filters for a given column.
-  // Cycle-safe: if we detect a cycle we fall back to all rows.
+  // Used to narrow available options for dependent filters.
   const rowsPassingUpstream = useCallback(
     (colId: string): T[] => {
-      const visited = new Set<string>();
-      const stack = [colId];
-      const excluded = new Set<string>([colId]);
-      let cycle = false;
-      while (stack.length) {
-        const cur = stack.pop()!;
-        if (visited.has(cur)) {
-          cycle = true;
-          continue;
-        }
-        visited.add(cur);
-        const ups = upstreamsFor.get(cur) ?? [];
-        for (const u of ups) {
-          if (u === colId) {
-            cycle = true;
-            continue;
-          }
-          excluded.add(u);
-          stack.push(u);
-        }
-      }
-      if (cycle && typeof console !== "undefined") {
-        console.warn(`[Table] dependsOn cycle involving column "${colId}"`);
-      }
-      // Apply all filters EXCEPT for the target column and its downstream deps
-      return filterRows(data, visibleColumns, filters, excluded);
+      const upstreamIds = upstreamFilterIds.get(colId);
+      if (!upstreamIds || upstreamIds.size === 0) return data;
+      const scopedEntries = filterEntries.filter(([id]) => upstreamIds.has(id));
+      if (scopedEntries.length === 0) return data;
+      return filterRows(data, scopedEntries, columnById, (row, column) =>
+        getValue(row, column),
+      );
     },
-    [data, visibleColumns, filters, upstreamsFor],
+    [data, upstreamFilterIds, filterEntries, columnById],
   );
 
   // ── Pipeline: filter → search → sort ─────────────────────
   const processed = useMemo(() => {
-    let rows = filterRows(data, visibleColumns, filters);
+    let rows = filterRows(sourceRows, filterEntries, columnById, (entry, column) =>
+      getValue(entry.row, column),
+    );
     if (search.trim()) {
       const q = search.toLowerCase();
-      const searchables = visibleColumns.filter(
-        (c) => c.searchable !== false && (c.cellType == null || c.cellType === "text" || c.cellType === "link" || c.cellType === "badge" || c.cellType === "chip" || c.searchable === true),
-      );
-      rows = rows.filter((row) =>
-        searchables.some((c) => {
-          const v = getValue(row, c);
+      rows = rows.filter((entry) =>
+        searchableColumns.some((column) => {
+          const v = getValue(entry.row, column);
           if (v == null) return false;
           return String(v).toLowerCase().includes(q);
         }),
       );
     }
-    if (sort.length) {
+    if (sortColumns.length) {
       rows = [...rows].sort((a, b) => {
-        for (const s of sort) {
-          const col = visibleColumns.find((c) => c.id === s.id);
-          if (!col) continue;
-          const cmp = col.sortFn
-            ? col.sortFn(a, b)
-            : compare(getValue(a, col), getValue(b, col), col.sortType);
-          if (cmp !== 0) return s.desc ? -cmp : cmp;
+        for (const { entry, column } of sortColumns) {
+          const cmp = column.sortFn
+            ? column.sortFn(a.row, b.row)
+            : compare(getValue(a.row, column), getValue(b.row, column), column.sortType);
+          if (cmp !== 0) return entry.desc ? -cmp : cmp;
         }
         return 0;
       });
     }
     return rows;
-  }, [data, visibleColumns, filters, search, sort]);
+  }, [sourceRows, filterEntries, columnById, search, searchableColumns, sortColumns]);
 
   // Remeasure proximity rects when the rendered row set changes
   useEffect(() => {
@@ -1324,7 +1374,7 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
 
   // ── Sort handler ─────────────────────────────────────────
   const toggleSort = (colId: string, shift: boolean) => {
-    const col = visibleColumns.find((c) => c.id === colId);
+    const col = columnById.get(colId);
     if (!col || col.sortable === false) return;
     const existingIdx = sort.findIndex((s) => s.id === colId);
     if (!shift) {
@@ -1354,14 +1404,15 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
   };
 
   // ── Selection logic ──────────────────────────────────────
-  const allProcessedIds = processed.map((r, i) => rowId(r, i));
+  const allProcessedIds = useMemo(() => processed.map((entry) => entry.id), [processed]);
   const allSelected =
-    allProcessedIds.length > 0 && allProcessedIds.every((id) => selectedIds.includes(id));
+    allProcessedIds.length > 0 && allProcessedIds.every((id) => selectedIdSet.has(id));
   const someSelected =
-    !allSelected && allProcessedIds.some((id) => selectedIds.includes(id));
+    !allSelected && allProcessedIds.some((id) => selectedIdSet.has(id));
   const toggleAll = () => {
     if (allSelected) {
-      setSelected(selectedIds.filter((id) => !allProcessedIds.includes(id)));
+      const processedIdSet = new Set(allProcessedIds);
+      setSelected(selectedIds.filter((id) => !processedIdSet.has(id)));
     } else {
       const merged = new Set([...selectedIds, ...allProcessedIds]);
       setSelected([...merged]);
@@ -1372,9 +1423,19 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
   };
 
   // ── Active filter chips ──────────────────────────────────
-  const activeFilters = Object.entries(filters)
-    .map(([id, v]) => ({ id, value: v, column: visibleColumns.find((c) => c.id === id) }))
-    .filter((x) => x.column);
+  const activeFilters = useMemo(
+    () =>
+      filterEntries
+        .map(([id, value]) => ({
+          id,
+          value,
+          column: columnById.get(id),
+        }))
+        .filter((entry): entry is { id: string; value: TableFilterValue; column: TableColumn<T> } =>
+          Boolean(entry.column),
+        ),
+    [filterEntries, columnById],
+  );
 
   // ── Filters popover anchor (one button that lists all columns) ──
   const [filtersPanelOpen, setFiltersPanelOpen] = useState(false);
@@ -1383,7 +1444,6 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
   // ── Rendering ────────────────────────────────────────────
   const hasActions = !!actions;
   const totalCols = visibleColumns.length + (selection ? 1 : 0) + (hasActions ? 1 : 0);
-  const filterableColumns = visibleColumns.filter((c) => c.filter);
   const activeFilterCount = Object.keys(filters).length;
 
   return (
@@ -1650,9 +1710,9 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
             )}
 
             {!loading &&
-              processed.map((row, i) => {
-                const id = rowId(row, i);
-                const isSelected = selectedIds.includes(id);
+              processed.map((entry, i) => {
+                const { id, row } = entry;
+                const isSelected = selectedIdSet.has(id);
                 const rowActions =
                   typeof actions === "function" ? actions(row) : actions;
                 return (
@@ -1702,19 +1762,16 @@ const DataTableInner = forwardRef(function DataTableInner<T>(
 
 function filterRows<T>(
   rows: T[],
-  columns: TableColumn<T>[],
-  filters: Record<string, TableFilterValue>,
-  exclude?: Set<string>,
+  filterEntries: [string, TableFilterValue][],
+  columnById: Map<string, TableColumn<any>>,
+  getCellValue: (row: T, column: TableColumn<any>) => unknown,
 ): T[] {
-  const entries = Object.entries(filters).filter(
-    ([id]) => !exclude?.has(id),
-  );
-  if (entries.length === 0) return rows;
+  if (filterEntries.length === 0) return rows;
   return rows.filter((row) =>
-    entries.every(([colId, val]) => {
-      const col = columns.find((c) => c.id === colId);
+    filterEntries.every(([colId, val]) => {
+      const col = columnById.get(colId);
       if (!col) return true;
-      const v = getValue(row, col);
+      const v = getCellValue(row, col);
       if (val.kind === "text") {
         return String(v ?? "").toLowerCase().includes(val.value.toLowerCase());
       }
@@ -1800,7 +1857,14 @@ function BodyRow<T>({
       {selection && (
         <td
           data-cell-action
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDownCapture={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
           style={{ padding: "var(--cell-py) var(--cell-px)" }}
         >
           <Switch
@@ -1819,8 +1883,21 @@ function BodyRow<T>({
           <td
             key={col.id}
             data-cell-action={isCellClickable ? "" : undefined}
+            onPointerDownCapture={
+              isCellClickable
+                ? (e) => {
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                  }
+                : undefined
+            }
             onPointerDown={
-              isCellClickable ? (e) => e.stopPropagation() : undefined
+              isCellClickable
+                ? (e) => {
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                  }
+                : undefined
             }
             onClick={
               isCellClickable
@@ -1845,7 +1922,14 @@ function BodyRow<T>({
       {actions && actions.length > 0 && (
         <td
           data-row-action
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDownCapture={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
           className="text-right"
           style={{ padding: "var(--cell-py) var(--cell-px)" }}
         >
@@ -1855,6 +1939,10 @@ function BodyRow<T>({
                 key={i}
                 variant="ghost"
                 size="icon-sm"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  e.nativeEvent.stopImmediatePropagation();
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   a.onClick(row);

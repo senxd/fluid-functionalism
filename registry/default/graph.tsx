@@ -708,6 +708,10 @@ const Graph = forwardRef<GraphRefHandle | HTMLDivElement, GraphProps>(function G
   const hasData = series.length > 0 && series[0].data.length >= 2;
   const effectiveHeight = compact ? COMPACT_HEIGHT : height ?? sizeCfg.height;
   const interactiveDisabled = disabled || loading;
+  const sourceSeriesById = useMemo(
+    () => new Map(series.map((entry) => [entry.id, entry])),
+    [series],
+  );
 
   // Track container width
   useLayoutEffect(() => {
@@ -765,13 +769,25 @@ const Graph = forwardRef<GraphRefHandle | HTMLDivElement, GraphProps>(function G
     () =>
       series.map((s) => {
         const sliced = sliceToWindow(s.data);
+        const visibleX = new Set(sliced.map((point) => point.x));
+        const startX = sliced[0]?.x;
+        const endX = sliced[sliced.length - 1]?.x;
         return {
           ...s,
           renderType: s.renderType ?? "line",
           axis: (s.axis ?? "left") as GraphAxis,
           rawData: sliced,
           displayData: isPercentMode ? normalizePercent(sliced) : sliced,
-          forecast: s.forecast ? s.forecast.filter((f) => sliced.some((p) => p.x === f.x) || (sliced[0] && sliced[sliced.length - 1] && f.x >= sliced[0].x && f.x <= sliced[sliced.length - 1].x)) : undefined,
+          forecast: s.forecast
+            ? s.forecast.filter(
+                (forecastPoint) =>
+                  visibleX.has(forecastPoint.x) ||
+                  (startX != null &&
+                    endX != null &&
+                    forecastPoint.x >= startX &&
+                    forecastPoint.x <= endX),
+              )
+            : undefined,
         };
       }),
     [series, isPercentMode, sliceToWindow],
@@ -1086,7 +1102,7 @@ const Graph = forwardRef<GraphRefHandle | HTMLDivElement, GraphProps>(function G
       if (!targetId) return;
       const ds = displaySeries.find((s) => s.id === targetId);
       if (!ds || !ds.interactive) return;
-      const rawSource = series.find((s) => s.id === targetId);
+      const rawSource = sourceSeriesById.get(targetId);
       if (!rawSource) return;
       // Find nearest raw index to the hovered primary x
       const anchorX = primary?.displayData[hoverIndex]?.x ?? 0;
@@ -1101,7 +1117,7 @@ const Graph = forwardRef<GraphRefHandle | HTMLDivElement, GraphProps>(function G
       setPulseKey(Date.now());
       onPointClick?.({ seriesId: targetId, x: raw.x, y: raw.y, index: rawIdx });
     },
-    [primary, hoverIndex, series, displaySeries, onPointClick],
+    [primary, hoverIndex, displaySeries, onPointClick, sourceSeriesById],
   );
 
   // Subscribe to sync group — mirror hovered x from peers.
@@ -1236,8 +1252,14 @@ const Graph = forwardRef<GraphRefHandle | HTMLDivElement, GraphProps>(function G
   // Hover values
   const hoverPoint =
     primary && hoverIndex !== null ? primary.displayData[hoverIndex] : null;
+  const hoverPrimaryRawPoint = useMemo(() => {
+    const primarySource = series[0];
+    if (!primarySource || !hoverPoint) return null;
+    const rawIdx = nearestIndex(primarySource.data, hoverPoint.x);
+    return primarySource.data[rawIdx] ?? null;
+  }, [series, hoverPoint]);
   const hoverPrimaryRawValue =
-    primary && hoverIndex !== null ? series[0].data[hoverIndex]?.y : null;
+    hoverPrimaryRawPoint?.y ?? null;
 
   // Accessible name
   const accessibleName =
